@@ -34,6 +34,11 @@ public class MainScreen{
         // Lopuksi freimi näkyviin ja ikkuna aukeaa
         mainFrame.setVisible(true);
         mainSplitPane.setDividerLocation(0.07);
+
+        //AINOA TAPA LAUKAISTA TOINEN NÄYTTÖ TÄLLÄ HETKELLÄ
+
+        //SecondaryScreen sec = new SecondaryScreen();
+
     }
 
     // Rakentaa framen ja sen sisällä olevat paneelit
