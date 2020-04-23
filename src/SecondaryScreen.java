@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -15,6 +17,7 @@ public class SecondaryScreen {
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
 
     public SecondaryScreen(){
+        loadReviews();
         MakeWindow();
 
     }
@@ -24,11 +27,13 @@ public class SecondaryScreen {
         secscreen.setSize(1200, 800);
         secscreen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
+        JPanel upperPanel = new JPanel();
         toolsPanel = new JPanel();
         //GridBagLayout gbLayout = new GridBagLayout();
         //toolsPanel.setLayout(gbLayout);
         //GridBagConstraints gbConstraint = new GridBagConstraints();
         toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.LINE_AXIS));
+        //toolsPanel.setMaximumSize(new Dimension(200, 50));
         titlesPanel = new JPanel();
         titlesPanel.setLayout(new BoxLayout(titlesPanel, BoxLayout.PAGE_AXIS));
 
@@ -42,7 +47,8 @@ public class SecondaryScreen {
         titlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         // "Pääpaneeli" on splitpane, jossa yläosaan tulee hakutyökalujen paneeli ja alaosaan eri nimikkeet
-        mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, toolsPanel, titlesScrollPane);
+        //mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, toolsPanel, titlesScrollPane);
+        mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upperPanel, titlesScrollPane);
         mainSplitPane.setOneTouchExpandable(false);
         mainSplitPane.setResizeWeight(0.5);
         mainSplitPane.setDividerSize(0);
@@ -51,11 +57,12 @@ public class SecondaryScreen {
 
         //Title ja kategoria
         JLabel title = new JLabel ("Lord of the Rings");
-        toolsPanel.add(title);
+        toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
         JLabel kategoria = new JLabel ("Elokuva");
         toolsPanel.add(kategoria);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
+        toolsPanel.add(Box.createHorizontalGlue());
 
 
         //Tehdään hakemistoiminto
@@ -67,13 +74,96 @@ public class SecondaryScreen {
         toolsPanel.add(sortby);
 
         JButton newReview = new JButton("+ Uusi arvostelu");
+        newReview.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AddReview();
+            }
+        });
         toolsPanel.add(newReview);
 
+
+        upperPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0.5;
+        c.ipady = 10;
+        upperPanel.add(title, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        upperPanel.add(kategoria, c);
+
+        c.gridx = 3;
+        c.gridy = 0;
+        c.gridheight = 2;
+        c.gridwidth = 1;
+        c.ipady = 40;
+        c.ipadx = 40;
+        c.weightx = 0;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        upperPanel.add(newReview);
+
+
+        c.anchor = GridBagConstraints.PAGE_END;
+        c.fill = GridBagConstraints.VERTICAL;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 0.5;
+        c.weighty = 0;
+        c.ipady = 0;
+        c.ipadx = 0;
+        c.gridx = 5;
+        c.gridy = 0;
+        JLabel sorttext = new JLabel("Hakuehdot:");
+        upperPanel.add(sorttext, c);
+
+        c.gridx = 5;
+        c.gridy = 1;
+        upperPanel.add(sortby, c);
 
         secscreen.add(mainSplitPane);
         secondary.setVisible(true);
         secscreen.setVisible(true);
-        AddReview();
+        mainSplitPane.setDividerLocation(0.07);
+        secscreen.setResizable(false);
+        //AddReview();
+        InitializeReviews();
+
+        //titlesPanelin elementtien lisäys
+
+        for(int i=0;i<arvostelut.size();i++) {
+            int arvosana = arvostelut.get(i).getArvosana();
+            String arvo = Integer.toString(arvosana);
+
+            JLabel grade = new JLabel("Ladattiin arvostelu arvosanalla " + arvo);
+            JPanel testi = new JPanel();
+            testi.add(grade);
+
+            /*secondary.add(testi);
+            testi.setVisible(true);
+            titlesScrollPane.add(testi);
+            secondary.revalidate();
+            secondary.repaint();*/
+
+            titlesPanel.add(testi);
+            testi.setVisible(true);
+            titlesPanel.revalidate();
+            titlesPanel.repaint();
+            //secondary.pack();
+
+            /*Object[] ok = {"Ok"};
+            JOptionPane.showOptionDialog(null, testi,
+                    "ööh", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
+        }
+
+        //titlesPanel.setVisible(true);
+
     }
 
     private void AddReview() {
@@ -142,6 +232,8 @@ public class SecondaryScreen {
                     JOptionPane.PLAIN_MESSAGE, null, ok, null);
             arvostelut.add(uusi);
             SaveReviews();
+            loadReviews();
+            InitializeReviews();
 
             /*addwindow.add(otsikko);
             addwindow.add(arvosana);
@@ -164,5 +256,43 @@ public class SecondaryScreen {
             e.printStackTrace();
             AddReview();
         } //catch (FileNotFoundException e){}
+    }
+
+    public void loadReviews() {
+        try {
+            FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
+                    "\\object.ser");
+            ObjectInputStream in = new ObjectInputStream(file);
+            ArrayList<ReviewPiece> temp = new ArrayList<>();
+            try {
+                temp = (ArrayList<ReviewPiece>) in.readObject();
+            } catch (ClassNotFoundException c) {
+                c.printStackTrace();
+            }
+            /*for(int i=0;i<temp.size();i++){
+                temp.get(i).getvalues();
+            }*/
+            this.arvostelut = temp;
+        } catch (IOException e) {
+            e.printStackTrace();
+            AddReview();
+        }
+    }
+
+    public void InitializeReviews() {
+        for(int i=0;i<arvostelut.size();i++) {
+            int arvosana = arvostelut.get(i).getArvosana();
+            String arvo = Integer.toString(arvosana);
+            JPanel testi = new JPanel();
+            JLabel grade = new JLabel("Ladattiin arvostelu arvosanalla " + arvo);
+            testi.add(grade);
+
+            /*Object[] ok = {"Ok"};
+            JOptionPane.showOptionDialog(null, testi,
+                    "Vahvistus", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
+
+            //secondary.add(testi);
+        }
     }
 }

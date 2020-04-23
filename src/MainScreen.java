@@ -37,7 +37,7 @@ public class MainScreen{
 
         //AINOA TAPA LAUKAISTA TOINEN NÄYTTÖ TÄLLÄ HETKELLÄ
 
-        //SecondaryScreen sec = new SecondaryScreen();
+        SecondaryScreen sec = new SecondaryScreen();
 
     }
 
@@ -197,6 +197,9 @@ public class MainScreen{
         titlePanel.add(categoryLabel);
         titlePanel.add(categoryChoice);
 
-        JOptionPane.showOptionDialog(null, titlePanel, "New Title", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, null);
+        JOptionPane.showOptionDialog(null, titlePanel, "New Title",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, optionsButtons, null);
     }
+
 }
