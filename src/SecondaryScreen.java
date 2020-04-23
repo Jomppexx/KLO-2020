@@ -4,19 +4,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
 public class SecondaryScreen {
 
     //private JFrame secondary;
     ArrayList<ReviewPiece> arvostelut = new ArrayList<>();
 
+    public String selectedTitleName;
+    public String selectedTitleCategory;
     private JDialog secscreen;
     private JFrame secondary; // = new JFrame();
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
     private JPanel titlesPanel; //paneeli nimikelistalle, josta pääsee arvosteluihin
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
 
-    public SecondaryScreen(){
+    public SecondaryScreen(String title, String category){
+        selectedTitleName = title;
+        selectedTitleCategory = category;
         loadReviews();
         MakeWindow();
 
@@ -57,10 +63,10 @@ public class SecondaryScreen {
 
         //Title ja kategoria
         //Käytä oliota? EntertainmentPiece lotr = new EntertainmentPiece("Lord of the Rings", "Elokuvat");
-        JLabel title = new JLabel ("Lord of the Rings");
+        JLabel title = new JLabel (selectedTitleName);
         toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
-        JLabel kategoria = new JLabel ("Elokuva");
+        JLabel kategoria = new JLabel (selectedTitleCategory);
         toolsPanel.add(kategoria);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
         toolsPanel.add(Box.createHorizontalGlue());
@@ -137,7 +143,7 @@ public class SecondaryScreen {
 
         //titlesPanelin elementtien lisäys
 
-        for(int i=0;i<arvostelut.size();i++) {
+        /*for(int i=0;i<arvostelut.size();i++) {
             int arvosana = arvostelut.get(i).getArvosana();
             String arvo = Integer.toString(arvosana);
 
@@ -145,11 +151,11 @@ public class SecondaryScreen {
             JPanel testi = new JPanel();
             testi.add(grade);
 
-            /*secondary.add(testi);
-            testi.setVisible(true);
-            titlesScrollPane.add(testi);
-            secondary.revalidate();
-            secondary.repaint();*/
+            //secondary.add(testi);
+            //testi.setVisible(true);
+            //titlesScrollPane.add(testi);
+            //secondary.revalidate();
+            //secondary.repaint();
 
             titlesPanel.add(testi);
             testi.setVisible(true);
@@ -157,11 +163,11 @@ public class SecondaryScreen {
             titlesPanel.repaint();
             //secondary.pack();
 
-            /*Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, testi,
-                    "ööh", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
-        }
+            //Object[] ok = {"Ok"};
+            //JOptionPane.showOptionDialog(null, testi,
+                    //"ööh", JOptionPane.YES_OPTION,
+                    //JOptionPane.PLAIN_MESSAGE, null, ok, null);
+        }*/
 
         //titlesPanel.setVisible(true);
 
@@ -178,9 +184,9 @@ public class SecondaryScreen {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel title = new JLabel("Lord of the Rings");
+        JLabel title = new JLabel(selectedTitleName);
         panel.add(title);
-        JLabel category = new JLabel("Elokuva");
+        JLabel category = new JLabel(selectedTitleCategory);
         JTextField headerfield = new JTextField("Otsikko", 1);
         headerfield.setMaximumSize(new Dimension(150,15));
         headerfield.setAlignmentX(addwindow.CENTER_ALIGNMENT);
@@ -212,9 +218,16 @@ public class SecondaryScreen {
         //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi on oikeasti "EI" eli NO-nappi
         //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
         if(result == JOptionPane.NO_OPTION){
-            ReviewPiece uusi = new ReviewPiece(headerfield.getText(),
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDateTime reviewtime = LocalDateTime.now();
+            String aika = reviewtime.format(dtf);
+            ReviewPiece uusi = new ReviewPiece(
+                    selectedTitleName,
+                    selectedTitleCategory,
+                    headerfield.getText(),
                     grade.getSelectedIndex()+1,
-                    reviewtext.getText());
+                    reviewtext.getText(),
+                    aika);
 
             JPanel added = new JPanel();
             added.setSize(400,800);
@@ -255,7 +268,6 @@ public class SecondaryScreen {
             out.writeObject(arvostelut);
         } catch (IOException e){
             e.printStackTrace();
-            AddReview();
         } //catch (FileNotFoundException e){}
     }
 
@@ -276,17 +288,16 @@ public class SecondaryScreen {
             this.arvostelut = temp;
         } catch (IOException e) {
             e.printStackTrace();
-            AddReview();
         }
     }
 
     public void InitializeReviews() {
         for(int i=0;i<arvostelut.size();i++) {
-            int arvosana = arvostelut.get(i).getArvosana();
+            /*int arvosana = arvostelut.get(i).getArvosana();
             String arvo = Integer.toString(arvosana);
             JPanel testi = new JPanel();
             JLabel grade = new JLabel("Ladattiin arvostelu arvosanalla " + arvo);
-            testi.add(grade);
+            testi.add(grade);*/
 
             /*Object[] ok = {"Ok"};
             JOptionPane.showOptionDialog(null, testi,
@@ -294,6 +305,42 @@ public class SecondaryScreen {
                     JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
 
             //secondary.add(testi);
+
+            int arvo = arvostelut.get(i).getArvosana();
+            String arvosana = Integer.toString(arvo);
+            String otsikko = arvostelut.get(i).getOtsikko();
+            String aika = arvostelut.get(i).getDate();
+
+            JLabel header = new JLabel(otsikko);
+            JLabel grade = new JLabel(arvosana);
+            JLabel date = new JLabel(aika);
+
+            JPanel testi = new JPanel();
+            testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
+            testi.add(grade);
+            testi.add(header);
+            testi.add(date);
+
+
+
+            titlesPanel.add(testi);
+            testi.setVisible(true);
+            titlesPanel.revalidate();
+            titlesPanel.repaint();
+
+            //secondary.pack();
+
+            /*secondary.add(testi);
+            testi.setVisible(true);
+            titlesScrollPane.add(testi);
+            secondary.revalidate();
+            secondary.repaint();*/
+
+            /*Object[] ok = {"Ok"};
+            JOptionPane.showOptionDialog(null, testi,
+                    "ööh", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
+
         }
     }
 }

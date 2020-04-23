@@ -7,15 +7,25 @@ public class ReviewPiece implements java.io.Serializable{
     private String otsikko;
     private int arvosana;
     private String arvosteluteksti;
+    public String date;
 
-    public ReviewPiece(/*String title, String category,*/ String header, int grade, String reviewtext) {
-        //nimike = title;
-        //kategoria = category;
+    public ReviewPiece(String title, String category,
+                       String header, int grade, String reviewtext,
+                       String ddmmyy) {
+        nimike = title;
+        kategoria = category;
         otsikko = header;
         arvosana = grade;
         arvosteluteksti = reviewtext;
+        date = ddmmyy;
     }
 
+    public String getDate(){
+        return date;
+    }
+    public void setDate(String ddmmyy){
+        date = ddmmyy;
+    }
     public String getNimike(){
         return nimike;
     }

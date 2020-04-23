@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -217,6 +218,20 @@ public class MainScreen{
         JLabel epCateg = new JLabel();
         JButton openButton = new JButton("Avaa");
         //openButton.addActionListener(event -> openButtonPushed());
+
+        /*JUHON MUUTOKSET
+        **
+        **
+         */
+
+        openButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SecondaryScreen sec = new SecondaryScreen(ep.getEntertainmentName(),
+                        ep.getCategory());
+            }
+        });
+
         JButton editButton = new JButton("Muokkaa");
         //editButton.addActionListener(event -> editButtonPushed());
 
