@@ -314,12 +314,33 @@ public class SecondaryScreen {
             JLabel header = new JLabel(otsikko);
             JLabel grade = new JLabel(arvosana);
             JLabel date = new JLabel(aika);
+            JButton open = new JButton("Avaa");
+            open.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                }
+            });
+            JButton edit = new JButton("Muokkaa");
+            edit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                }
+            });
 
             JPanel testi = new JPanel();
             testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
             testi.add(grade);
+            testi.add(Box.createRigidArea(new Dimension(5, 0)));
             testi.add(header);
+            testi.add(Box.createHorizontalGlue());
             testi.add(date);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
+            testi.add(open);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
+            testi.add(edit);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
 
 
 
