@@ -56,6 +56,7 @@ public class SecondaryScreen {
         ////toolsPanel.add(Box.createHorizontalGlue());
 
         //Title ja kategoria
+        //Käytä oliota? EntertainmentPiece lotr = new EntertainmentPiece("Lord of the Rings", "Elokuvat");
         JLabel title = new JLabel ("Lord of the Rings");
         toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));

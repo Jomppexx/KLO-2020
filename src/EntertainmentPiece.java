@@ -9,4 +9,20 @@ public class EntertainmentPiece {
         entertainmentName = enternName;
         category = categ;
     }
+
+    public String getEntertainmentName(){
+        return entertainmentName;
+    }
+
+    public void setEntertainmentName(String newName){
+        entertainmentName = newName;
+    }
+
+    public String getCategory(){
+        return category;
+    }
+
+    public void setCategory(String newCategory){
+        category = newCategory;
+    }
 }

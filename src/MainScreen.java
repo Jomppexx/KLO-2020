@@ -22,12 +22,8 @@ public class MainScreen{
         // Rakentaa näkymän yläosan työkalupalkin ja sen valikot
         buildMenuBar();
 
-        JLabel testText = new JLabel("Ei viddu mage :D"); //testaustarkoituksiin
-
-        titlesPanel.add(testText);
-
-        toolsPanel.setBackground(Color.CYAN);
-        titlesPanel.setBackground(Color.GREEN);
+        toolsPanel.setBackground(Color.LIGHT_GRAY);
+        titlesPanel.setBackground(Color.LIGHT_GRAY);
 
         mainFrame.setLocationRelativeTo(null);
 
@@ -37,7 +33,7 @@ public class MainScreen{
 
         //AINOA TAPA LAUKAISTA TOINEN NÄYTTÖ TÄLLÄ HETKELLÄ
 
-        SecondaryScreen sec = new SecondaryScreen();
+        //SecondaryScreen sec = new SecondaryScreen();
 
     }
 
@@ -197,9 +193,55 @@ public class MainScreen{
         titlePanel.add(categoryLabel);
         titlePanel.add(categoryChoice);
 
-        JOptionPane.showOptionDialog(null, titlePanel, "New Title",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                null, optionsButtons, null);
+        int optionResult = JOptionPane.showOptionDialog(null, titlePanel, "Uusi nimike", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, null);
+        //JOptionPane.showInputDialog(null, "Syötä nimikkeeseen liittyvät tiedot", "Uusi nimike", JOptionPane.PLAIN_MESSAGE, null, categories, "Kirjat");
+        if(optionResult == JOptionPane.YES_OPTION){
+            String name = titleName.getText();
+            String categ = (String) categoryChoice.getSelectedItem();
+            if(name != null && !name.isEmpty()){
+                createEntertainmentPiece(name, categ);
+            }else{
+                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!\nHaluamaasi nimikettä ei nyt luotu.", "Huomautus!", JOptionPane.WARNING_MESSAGE);
+            }
+        }
     }
 
+    //Luo uuden viihdenimikkeen, jolle kysytään käyttäjältä nimi ja kategoria
+    //Luo myös paneelin viihdenimikkeelle, joka lisätään sitten päänäkymään
+    public void createEntertainmentPiece(String name, String category){
+
+        EntertainmentPiece ep = new EntertainmentPiece(name, category);
+        JOptionPane.showMessageDialog(null, "Haluamasi nimike luotiin onnistuneesti.");
+        JPanel epPanel = new JPanel();
+        JLabel epName = new JLabel();
+        JLabel epCateg = new JLabel();
+        JButton openButton = new JButton("Avaa");
+        //openButton.addActionListener(event -> openButtonPushed());
+        JButton editButton = new JButton("Muokkaa");
+        //editButton.addActionListener(event -> editButtonPushed());
+
+        //BoxLayout toistaiseksi
+        epPanel.setLayout(new BoxLayout(epPanel, BoxLayout.LINE_AXIS));
+        //epPanel.setLayout(new GridBagLayout());
+        //GridBagConstraints gbc = new GridBagConstraints();
+
+        String fullCategory = ("Kategoria: " + ep.getCategory());
+        epName.setText(ep.getEntertainmentName());
+        epCateg.setText(fullCategory);
+
+        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(epName);
+        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(epCateg);
+        epPanel.add(Box.createHorizontalGlue());
+        epPanel.add(openButton);
+        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(editButton);
+        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+
+        titlesPanel.add(epPanel);
+        titlesPanel.add(Box.createRigidArea(new Dimension(0,10)));
+        titlesPanel.revalidate();
+        titlesPanel.repaint();
+    }
 }
