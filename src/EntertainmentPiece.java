@@ -1,6 +1,6 @@
 
 // Luokka, jolla luodaan erilaisia viihteen muotoja, joita voidaan sitten arvostella
-public class EntertainmentPiece {
+public class EntertainmentPiece implements java.io.Serializable {
 
     private String entertainmentName;
     private String category;

@@ -1,14 +1,14 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
+import java.io.*;
+import java.util.ArrayList;
 
 // Luokka päänäkymälle
-public class MainScreen{
+public class MainScreen extends JFrame {
 
+    private ArrayList <String> entertainmentNameArray = new ArrayList<>();
     private JFrame mainFrame;
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
     private JPanel titlesPanel; //paneeli nimikelistalle, josta pääsee arvosteluihin
@@ -23,6 +23,8 @@ public class MainScreen{
         // Rakentaa näkymän yläosan työkalupalkin ja sen valikot
         buildMenuBar();
 
+        loadEntertainmentPieces();
+
         toolsPanel.setBackground(Color.LIGHT_GRAY);
         titlesPanel.setBackground(Color.LIGHT_GRAY);
 
@@ -31,11 +33,6 @@ public class MainScreen{
         // Lopuksi freimi näkyviin ja ikkuna aukeaa
         mainFrame.setVisible(true);
         mainSplitPane.setDividerLocation(0.07);
-
-        //AINOA TAPA LAUKAISTA TOINEN NÄYTTÖ TÄLLÄ HETKELLÄ
-
-        //SecondaryScreen sec = new SecondaryScreen();
-
     }
 
     // Rakentaa framen ja sen sisällä olevat paneelit
@@ -202,34 +199,42 @@ public class MainScreen{
             if(name != null && !name.isEmpty()){
                 createEntertainmentPiece(name, categ);
             }else{
-                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!\nHaluamaasi nimikettä ei nyt luotu.", "Huomautus!", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!\nHaluamaasi nimikettä ei nyt luotu.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
 
     //Luo uuden viihdenimikkeen, jolle kysytään käyttäjältä nimi ja kategoria
     //Luo myös paneelin viihdenimikkeelle, joka lisätään sitten päänäkymään
-    public void createEntertainmentPiece(String name, String category){
+    public void createEntertainmentPiece(String name, String category) {
 
-        EntertainmentPiece ep = new EntertainmentPiece(name, category);
-        JOptionPane.showMessageDialog(null, "Haluamasi nimike luotiin onnistuneesti.");
+        boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
+
+        if (!hasNonAlpha) {
+            if (!entertainmentNameArray.contains(name)) {
+                entertainmentNameArray.add(name);
+                EntertainmentPiece ep = new EntertainmentPiece(name, category);
+                JOptionPane.showMessageDialog(null, "Haluamasi nimike luotiin onnistuneesti.");
+                saveEntertainmentPiece(ep);
+                buildEPBox(ep);
+            } else {
+                JOptionPane.showMessageDialog(null, "Samalla nimellä tehty nimike löytyy jo.\nNimikettä ei luotu.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen.\nKokeile uutta nimeä.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    //Rakentaa nimikkeen avaa/muokkaa/tiedot boksin päänäkymään
+    public void buildEPBox(EntertainmentPiece ep){
         JPanel epPanel = new JPanel();
         JLabel epName = new JLabel();
         JLabel epCateg = new JLabel();
         JButton openButton = new JButton("Avaa");
-        //openButton.addActionListener(event -> openButtonPushed());
 
-        /*JUHON MUUTOKSET
-        **
-        **
-         */
-
-        openButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SecondaryScreen sec = new SecondaryScreen(ep.getEntertainmentName(),
-                        ep.getCategory());
-            }
+        openButton.addActionListener(event -> {
+            SecondaryScreen sec = new SecondaryScreen(ep.getEntertainmentName(),
+                    ep.getCategory());
         });
 
         JButton editButton = new JButton("Muokkaa");
@@ -244,19 +249,71 @@ public class MainScreen{
         epName.setText(ep.getEntertainmentName());
         epCateg.setText(fullCategory);
 
-        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         epPanel.add(epName);
-        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         epPanel.add(epCateg);
         epPanel.add(Box.createHorizontalGlue());
         epPanel.add(openButton);
-        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
         epPanel.add(editButton);
-        epPanel.add(Box.createRigidArea(new Dimension(20,0)));
+        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
 
+        titlesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         titlesPanel.add(epPanel);
-        titlesPanel.add(Box.createRigidArea(new Dimension(0,10)));
         titlesPanel.revalidate();
         titlesPanel.repaint();
     }
+
+    public void saveEntertainmentPiece (EntertainmentPiece ep) {
+        try {
+            String entertainmentFile = "\\" + ep.getEntertainmentName() + ".ser";
+            String directory = System.getProperty("user.dir") + entertainmentFile;
+            System.out.println(directory);
+            FileOutputStream file = new FileOutputStream(directory);
+            ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(ep);
+
+        } catch (IOException e){
+            e.printStackTrace();
+        } //catch (FileNotFoundException e){}
+
+        try {
+            FileWriter fw = new FileWriter("epArray.txt");
+            BufferedWriter br = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(br);
+            for (String str : entertainmentNameArray) {
+                out.write(str + System.lineSeparator());
+            }
+            out.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void loadEntertainmentPieces() {
+        EntertainmentPiece temp = new EntertainmentPiece("","");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("epArray.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                entertainmentNameArray.add(line);
+            }
+            br.close();
+
+            for (String piece : entertainmentNameArray) {
+                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\" + piece + ".ser");
+                ObjectInputStream objin = new ObjectInputStream(fis);
+                try {
+                    temp = (EntertainmentPiece) objin.readObject();
+                } catch (ClassNotFoundException cnfe) {
+                    cnfe.printStackTrace();
+                }
+                buildEPBox(temp);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
