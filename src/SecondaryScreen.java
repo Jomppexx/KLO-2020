@@ -14,8 +14,8 @@ public class SecondaryScreen {
 
     public String selectedTitleName;
     public String selectedTitleCategory;
-    private JDialog secscreen;
-    private JFrame secondary; // = new JFrame();
+    //private JDialog secscreen;
+    private JFrame secondaryFrame; //pääikkuna arvostelujen hallinnoimiselle
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
     private JPanel titlesPanel; //paneeli nimikelistalle, josta pääsee arvosteluihin
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
@@ -23,17 +23,21 @@ public class SecondaryScreen {
     public SecondaryScreen(String title, String category){
         selectedTitleName = title;
         selectedTitleCategory = category;
+        //loadReviews();
         loadReviews();
         MakeWindow();
+        buildMenuBar();
 
     }
     private void MakeWindow() {
-        JFrame secondary = new JFrame();
-        JDialog secscreen = new JDialog(secondary, "Arvostelut");
+        secondaryFrame = new JFrame("Arvosteluohjelma");
+        //JDialog secscreen = new JDialog(secondary, "Arvostelut");
         //secscreen.setBackground(Color.DARK_GRAY);
         //secondary.setBackground(Color.DARK_GRAY);
-        secscreen.setSize(1200, 800);
-        secscreen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        //secscreen.setSize(1200, 800);
+        //secscreen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        secondaryFrame.setSize(1200,800);
+        secondaryFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel upperPanel = new JPanel();
         upperPanel.setBackground(Color.LIGHT_GRAY);
@@ -53,7 +57,8 @@ public class SecondaryScreen {
          */
         // scrollPane, mahdollistaa ikkunan scrollaamisen...
         JScrollPane titlesScrollPane = new JScrollPane(titlesPanel);
-        secscreen.add(titlesScrollPane);
+        //secscreen.add(titlesScrollPane);
+        secondaryFrame.add(titlesScrollPane);
         titlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         // "Pääpaneeli" on splitpane, jossa yläosaan tulee hakutyökalujen paneeli ja alaosaan eri nimikkeet
@@ -137,11 +142,13 @@ public class SecondaryScreen {
         c.gridy = 1;
         upperPanel.add(sortby, c);
 
-        secscreen.add(mainSplitPane);
-        secondary.setVisible(true);
-        secscreen.setVisible(true);
+        //secscreen.add(mainSplitPane);
+        secondaryFrame.add(mainSplitPane);
+        secondaryFrame.setVisible(true);
+        //secscreen.setVisible(true);
         mainSplitPane.setDividerLocation(0.07);
-        secscreen.setResizable(false);
+        //secscreen.setResizable(false);
+        secondaryFrame.setResizable(false);
         //AddReview();
         InitializeReviews();
 
@@ -175,6 +182,89 @@ public class SecondaryScreen {
 
         //titlesPanel.setVisible(true);
 
+    }
+
+    private void buildMenuBar(){
+        // Luodaan menupalkin eri menut ja itse palkki
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("Tiedosto");
+        JMenu optionsMenu = new JMenu("Asetukset");
+        JMenu helpMenu = new JMenu("Ohjeet");
+
+        // Lisätään eri vaihtoehdoille toimintonsa
+        JMenuItem exitItem = new JMenuItem("Lopeta ohjelma");
+        exitItem.setToolTipText("Lopettaa ohjelman toiminnan.");
+        // "Lopeta ohjelma" kohtaa painaessa ohjelma sammuu
+        exitItem.addActionListener((event) -> System.exit(0));
+
+        JMenuItem optionsItem = new JMenuItem("Asetukset");
+        optionsItem.setToolTipText("Avaa asetukset ja muuta niitä.");
+        optionsItem.addActionListener((event) -> openOptionsWindow());
+
+        JMenuItem helpItem = new JMenuItem("Apua");
+        helpItem.setToolTipText("Tietoja ohjelmasta ja käyttöohje.");
+        helpItem.addActionListener((event) -> openHelpWindow());
+
+        // Lisätään menuihin niille kuuluvat itemit
+        fileMenu.add(exitItem);
+        optionsMenu.add(optionsItem);
+        helpMenu.add(helpItem);
+
+        // Lisätään menupalkkiin sen menut
+        menuBar.add(fileMenu);
+        menuBar.add(optionsMenu);
+        menuBar.add(helpMenu);
+
+        // Lopuksi laitetaan menupalkki osaksi framea (ja näkyviin)
+        secondaryFrame.setJMenuBar(menuBar);
+    }
+
+    // Avaa help dialogin, kun help nappia painetaan menussa
+    private void openHelpWindow(){
+
+        // Help -ikkunan sisältö tähän stringiin
+        final  String helpContent = "Tähän tulee ohjeet ohjelman käyttöön ja selitys siitä, mikä tämä ohjelma on.";
+
+        // frame help ikkunalle
+        JFrame helpFrame = new JFrame("Apua ja infoa");
+        helpFrame.setSize(600, 440);
+
+        // Paneeli frameen. setLocationRelativeTo(null [object]) keskittää ikkunan
+        JPanel helpPanel = new JPanel();
+        helpFrame.setLocationRelativeTo(null);
+
+        // JOptionPane dialogi, parempi kuin pelkkä frame/pane systeemi, koska vaatii fokuksen siihen asti että ikkuna suljetaan
+        JOptionPane.showMessageDialog(helpFrame, helpContent, "Apua ja infoa", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    // Avaa options dialogin kun options nappia painetaan menussa
+    private void openOptionsWindow(){
+
+        JLabel langLabel = new JLabel("Kieli:");
+        JLabel ratingsLabel = new JLabel("Piilota arvosanat?");
+
+        // Drop-down valikko
+        String[] languages = {"English", "Suomi"};
+        JComboBox<String> langChoice = new JComboBox<>(languages);
+        // Defaulttina valittu indeksi 1 (alkaa nollasta)
+        langChoice.setSelectedIndex(1);
+
+        JCheckBox disableRatings = new JCheckBox();
+
+        GridLayout grid = new GridLayout(3,2); //GridLayout, jossa 3 riviä, 2 pystyriviä
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(grid);
+
+        optionsPanel.add(langLabel);
+        optionsPanel.add(langChoice);
+        optionsPanel.add(ratingsLabel);
+        optionsPanel.add(disableRatings);
+
+
+        Object[] optionsButtons = {"Tallenna", "Peruuta"};
+
+        //Luodaan options dialogi
+        JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
     }
 
     private void AddReview() {
@@ -715,7 +805,8 @@ public class SecondaryScreen {
         int result = JOptionPane.showOptionDialog(null, deleteConfirmation,
                 "", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
-        //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi on oikeasti "EI" eli NO-nappi
+        //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi
+        //on oikeasti "EI" eli NO-nappi
         //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
         if (result == JOptionPane.NO_OPTION) {
             arvostelut.remove(i);
