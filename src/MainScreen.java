@@ -1,10 +1,9 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 // Luokka päänäkymälle
 public class MainScreen extends JFrame {
@@ -284,19 +283,21 @@ public class MainScreen extends JFrame {
     public void saveEntertainmentPiece (EntertainmentPiece ep) {
         //Yritetään kirjoittaa entertainmentPiece olion tiedot tiedostoon...
         try {
-            String entertainmentFile = File.separator + File.separator + ep.getEntertainmentName() + ".ser";
+            String entertainmentFile = File.separator + ep.getEntertainmentName() + ".ser";
             String directory = System.getProperty("user.dir") + entertainmentFile;
             System.out.println(directory);
             FileOutputStream file = new FileOutputStream(directory);
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(ep);
             out.close();
+            writeEPArrayTxt();
 
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
+    }
         //Kirjoitetaan (ja luodaan) epArray.txt, johon lisätään edellä luotu EP
+    private void writeEPArrayTxt(){
         try {
             FileWriter fw = new FileWriter("epArray.txt");
             BufferedWriter br = new BufferedWriter(fw);
@@ -313,10 +314,18 @@ public class MainScreen extends JFrame {
     // Lukee nimikelistan ja listan avulla avaa nimikkeiden tiedostot
     // Luo nimikelistan päänäkymään createEPBox metodin avulla käyttämällä luettuja EP tiedostoja
     public void loadEntertainmentPieces() {
+
+        //Luodaan epArray.txt jos sitä ei ole jo olemassa
+        //Estetään virheilmoitus, joka syntyisi jos tiedostoa ei ole
+
+        File file = new File("epArray.txt");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //Luetaan epArray.txt tiedostosta minkä nimisiä nimikkeitä ohjelmassa pitäisi näkyä
-
-        //LISÄÄ: JOS TIEDOSTO ON OLEMASSA
-
         EntertainmentPiece temp = new EntertainmentPiece("","");
         try {
             BufferedReader br = new BufferedReader(new FileReader("epArray.txt"));
@@ -329,15 +338,27 @@ public class MainScreen extends JFrame {
             //Luetaan jokaisen nimikkeen mukainen .ser tiedosto, jossa on nimikkeeseen liittyvä olio
             //Luodaan jokaisesta nimikkeestä nimilistaan olio
             for (String piece : entertainmentNameArray) {
-                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + File.separator + piece + ".ser");
+                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
                 ObjectInputStream objin = new ObjectInputStream(fis);
-                try {
-                    temp = (EntertainmentPiece) objin.readObject();
-                    objin.close();
-                } catch (ClassNotFoundException cnfe) {
-                    cnfe.printStackTrace();
+
+                File EPfile = new File(System.getProperty("user.dir"));
+                String fullFileName = File.separator + piece + ".ser";
+                File fileToCheck = new File(EPfile, fullFileName);
+
+                if(!fileToCheck.isFile()) {
+                    JOptionPane.showMessageDialog(null, (piece + " nimistä .ser tiedostoa ei löytynyt... (loadEntertainmentPieces"),
+                            "Varoitus", JOptionPane.WARNING_MESSAGE);
+                } else {
+
+                    try {
+                        temp = (EntertainmentPiece) objin.readObject();
+                        objin.close();
+                    } catch (ClassNotFoundException cnfe) {
+                        cnfe.printStackTrace();
+                    }
+                    buildEPBox(temp);
                 }
-                buildEPBox(temp);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -350,21 +371,21 @@ public class MainScreen extends JFrame {
     //Metodi antaa myös muuttaa epn nimen ja kategorian
     private void editButtonPushed(EntertainmentPiece ep, JLabel oldNameLabel, JLabel oldCategLabel ){
 
+        AtomicReference<EntertainmentPiece> temp = new AtomicReference<>(new EntertainmentPiece("", ""));
         JTextField epName = new JTextField(ep.getEntertainmentName());
         JLabel nimiLabel = new JLabel("Syötä nimi:", SwingConstants.CENTER);
         JLabel categLabel = new JLabel("Valitse kategoria:", SwingConstants.CENTER);
         JPanel editPanel = new JPanel();
         String categories[] = {"Lautapelit", "Kirjat", "Elokuvat", "Roolipelit", "Videopelit"};
         JButton deleteButton = new JButton("Poista tämä nimike");
-        //deleteButton.addActionListener(event -> deleteEntertainmentPiece());
+        String oldEPName = ep.getEntertainmentName();
+        String oldEPCat = ep.getCategory();
 
         JComboBox<String> categBox = new JComboBox<>(categories);
         Object[] optionsButtons = {"Tallenna muutokset", "Peruuta"};
 
-        String oldEPName = ep.getEntertainmentName();
-        String oldEPCat = ep.getCategory();
-        String temp = ("Olet muokkaamassa nimikettä " + oldEPName + " (" + oldEPCat + ")");
-        JLabel oldData = new JLabel(temp);
+        String modString = ("Olet muokkaamassa nimikettä " + oldEPName + " (" + oldEPCat + ")");
+        JLabel oldData = new JLabel(modString);
 
         editPanel.setLayout(new GridLayout(3,2));
         editPanel.add(nimiLabel);
@@ -374,30 +395,79 @@ public class MainScreen extends JFrame {
         editPanel.add(oldData);
         editPanel.add(deleteButton);
 
+        deleteButton.addActionListener(event -> {
+
+            File file = new File(System.getProperty("user.dir"));
+            String fullFileName = File.separator + oldNameLabel.getText() + ".ser";
+            File fileToDelete = new File(file, fullFileName);
+
+            if(!fileToDelete.delete()){
+                JOptionPane.showMessageDialog(null, "Poistaminen ei onnistunut...",
+                        "Varoitus", JOptionPane.ERROR_MESSAGE);
+            } else {
+
+                entertainmentNameArray.remove(oldEPName);
+                writeEPArrayTxt();
+                titlesPanel.removeAll();
+
+                for (String piece : entertainmentNameArray) {
+                    try {
+                        //LISÄÄ FILE OLEMASSAOLO CHECK
+                        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
+                        ObjectInputStream objin = new ObjectInputStream(fis);
+                        try {
+                            temp.set((EntertainmentPiece) objin.readObject());
+                            objin.close();
+                        } catch (ClassNotFoundException cnfe) {
+                            cnfe.printStackTrace();
+                        }
+
+                        buildEPBox(temp.get());
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
+                }
+                titlesPanel.revalidate();
+                titlesPanel.repaint();
+                Window w = SwingUtilities.getWindowAncestor(deleteButton);
+                if(w != null) {
+                    w.dispose();
+                }
+            }
+        });
+
         int optionResult = JOptionPane.showOptionDialog(null, editPanel, "Muokkaa nimikettä", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, optionsButtons, null);
 
+        //Jos käyttäjä painaa YES_OPTIOTA eli Tallenna muutokset nappia
         if (optionResult == JOptionPane.YES_OPTION){
             String newName = epName.getText();
             String newCateg = (String) categBox.getSelectedItem();
             if(newName != null && !newName.isEmpty()){
-                boolean hasNonAlpha = newName.matches("^.*[^a-zA-Z0-9äöÄÖ ].*$");
 
+                //Tarkastetaan, että nimi käy tiedostonimeksi
+                boolean hasNonAlpha = newName.matches("^.*[^a-zA-Z0-9äöÄÖ ].*$");
                 if(!hasNonAlpha) {
-                    entertainmentNameArray.remove(new String(oldEPName));
+                    //Poistetaan vanhan nimikkeen tiedot listalta ja lisätään uusi nimi
+                    entertainmentNameArray.remove(oldEPName);
                     entertainmentNameArray.add(newName);
 
+                    //Muutetaan nimikkeolion tiedot uusiksi
                     ep.setEntertainmentName(newName);
                     ep.setCategory(newCateg);
 
+                    //Yritetään lukea "nimike".ser tiedostosta jossa ohjelma runnataan
                     try{
                         File file = new File(System.getProperty("user.dir"));
-                        String fullFileName = File.separator + File.separator + oldEPName + ".ser";
+                        String fullFileName = File.separator + oldEPName + ".ser";
                         File fileToDelete = new File(file, fullFileName);
                         saveEntertainmentPiece(ep);
 
                         if(!fileToDelete.delete()){
-                            JOptionPane.showMessageDialog(null, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...");
+                            JOptionPane.showMessageDialog(null, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...",
+                                    "Varoitus", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

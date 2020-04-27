@@ -62,7 +62,6 @@ public class SecondaryScreen {
         ////toolsPanel.add(Box.createHorizontalGlue());
 
         //Title ja kategoria
-        //Käytä oliota? EntertainmentPiece lotr = new EntertainmentPiece("Lord of the Rings", "Elokuvat");
         JLabel title = new JLabel (selectedTitleName);
         toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
@@ -261,7 +260,7 @@ public class SecondaryScreen {
     public void SaveReviews () {
         try {
             //HUOMIO: INTELLIJ KIRJOITTAA OBJECT.SERIN SRC-KANSION YLEMPÄÄN KANSIOON
-            String directory = System.getProperty("user.dir") + "\\object.ser";
+            String directory = System.getProperty("user.dir") + File.separator +  "object.ser";
             System.out.println(directory);
             FileOutputStream file = new FileOutputStream(directory);
             ObjectOutputStream out = new ObjectOutputStream(file);
@@ -272,22 +271,25 @@ public class SecondaryScreen {
     }
 
     public void loadReviews() {
-        try {
-            FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
-                    "\\object.ser");
-            ObjectInputStream in = new ObjectInputStream(file);
-            ArrayList<ReviewPiece> temp = new ArrayList<>();
+        File f = new File(System.getProperty("user.dir") + File.separator + "object.ser");
+        if(f.isFile()) {
             try {
-                temp = (ArrayList<ReviewPiece>) in.readObject();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
-            }
+                FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
+                        File.separator + "object.ser");
+                ObjectInputStream in = new ObjectInputStream(file);
+                ArrayList<ReviewPiece> temp = new ArrayList<>();
+                try {
+                    temp = (ArrayList<ReviewPiece>) in.readObject();
+                    this.arvostelut = temp;
+                } catch (ClassNotFoundException c) {
+                    c.printStackTrace();
+                }
             /*for(int i=0;i<temp.size();i++){
                 temp.get(i).getvalues();
             }*/
-            this.arvostelut = temp;
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
