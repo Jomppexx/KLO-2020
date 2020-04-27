@@ -286,6 +286,7 @@ public class SecondaryScreen {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.LINE_AXIS));
         titlePanel.add(titleIs);
         titlePanel.add(title);
+        titlePanel.setBackground(Color.LIGHT_GRAY);
         panel.add(titlePanel);
         //panel.add(title);
 
@@ -295,6 +296,7 @@ public class SecondaryScreen {
         categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.LINE_AXIS));
         categoryPanel.add(categoryIs);
         categoryPanel.add(category);
+        categoryPanel.setBackground(Color.LIGHT_GRAY);
         panel.add(categoryPanel);
 
         JTextField headerfield = new JTextField(1);
@@ -305,6 +307,7 @@ public class SecondaryScreen {
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.LINE_AXIS));
         headerPanel.add(headerIs);
         headerPanel.add(headerfield);
+        headerPanel.setBackground(Color.LIGHT_GRAY);
         panel.add(headerPanel);
 
         String grades[]={"1","2","3","4","5","6","7","8","9","10"};
@@ -315,6 +318,7 @@ public class SecondaryScreen {
         gradePanel.setLayout(new BoxLayout(gradePanel, BoxLayout.LINE_AXIS));
         gradePanel.add(gradeIs);
         gradePanel.add(grade);
+        gradePanel.setBackground(Color.LIGHT_GRAY);
         panel.add(gradePanel);
 
 
@@ -348,9 +352,9 @@ public class SecondaryScreen {
 
         panel.add(plusmedia);
 
-        panel.setBorder(BorderFactory.createTitledBorder("demo"));
+        /*panel.setBorder(BorderFactory.createTitledBorder("demo"));
         addwindow.getContentPane().add(panel);
-        addwindow.add(panel);
+        addwindow.add(panel);*/
         //addwindow.setVisible(true);
 
         Object[] savecancelbuttons = {"Peru", "Tallenna"};
@@ -587,6 +591,7 @@ public class SecondaryScreen {
         nimikealue.setLayout(new BoxLayout(nimikealue, BoxLayout.LINE_AXIS));
         nimikealue.add(nimike);
         nimikealue.add(title);
+        nimikealue.setBackground(Color.LIGHT_GRAY);
 
         JLabel category = new JLabel(selectedTitleCategory);
         category.setAlignmentX(addwindow.CENTER_ALIGNMENT);
@@ -595,6 +600,7 @@ public class SecondaryScreen {
         kategoriaalue.setLayout(new BoxLayout(kategoriaalue, BoxLayout.LINE_AXIS));
         kategoriaalue.add(kategoria);
         kategoriaalue.add(category);
+        kategoriaalue.setBackground(Color.LIGHT_GRAY);
 
         JTextField headerfield = new JTextField(temp.getOtsikko(), 1);
         headerfield.setMaximumSize(new Dimension(150,15));
@@ -647,6 +653,7 @@ public class SecondaryScreen {
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
         //textArea.add(reviewtext);
         textArea.add(rullatirullaa);
+        textArea.setBackground(Color.LIGHT_GRAY);
         panel.add(textArea);
         //panel.add(reviewtext);
         //panel.add(rullatirullaa);
@@ -739,14 +746,15 @@ public class SecondaryScreen {
         displayPanel.setMaximumSize(new Dimension(600,300));
         displayPanel.setPreferredSize(new Dimension(600,300));
         displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.PAGE_AXIS));
+        displayPanel.setBackground(Color.LIGHT_GRAY);
 
         JPanel headerAndGrade = new JPanel();
         //parentikkunan leveys
         //ota koko leveys saatavilla
         headerAndGrade.setMaximumSize(new Dimension(1000,50));
         headerAndGrade.setPreferredSize(new Dimension(1000,50));
-        headerAndGrade.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.red), headerAndGrade.getBorder()));
+        //headerAndGrade.setBorder(BorderFactory.createCompoundBorder(
+                //BorderFactory.createLineBorder(Color.red), headerAndGrade.getBorder()));
         headerAndGrade.setLayout(new BoxLayout(headerAndGrade, BoxLayout.LINE_AXIS));
         ReviewPiece temp = arvostelut.get(i);
         JLabel grade = new JLabel(Integer.toString(temp.getArvosana()));
@@ -756,6 +764,7 @@ public class SecondaryScreen {
         headerAndGrade.add(Box.createRigidArea(new Dimension(15,0)));
         headerAndGrade.add(header);
         headerAndGrade.add(Box.createRigidArea(new Dimension(5,0)));
+        headerAndGrade.setBackground(Color.LIGHT_GRAY);
 
         displayPanel.add(headerAndGrade);
 
@@ -767,13 +776,13 @@ public class SecondaryScreen {
         JPanel test = new JPanel();
         test.setLayout(new BoxLayout(test, BoxLayout.PAGE_AXIS));
         //Multiline, GridLayout
-        JTextArea hehe = new JTextArea(temp.getArvosteluteksti(), 5,
+        JTextArea reviewTextGoesHere = new JTextArea(temp.getArvosteluteksti(), 5,
                 60);
                 //displayPanel.getWidth());
-        hehe.setWrapStyleWord(true);
-        hehe.setLineWrap(true);
-        hehe.setEditable(false);
-        JScrollPane rullatirullaa = new JScrollPane(hehe);
+        reviewTextGoesHere.setWrapStyleWord(true);
+        reviewTextGoesHere.setLineWrap(true);
+        reviewTextGoesHere.setEditable(false);
+        JScrollPane rullatirullaa = new JScrollPane(reviewTextGoesHere);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         test.add(Box.createVerticalGlue());
 
@@ -781,6 +790,7 @@ public class SecondaryScreen {
         JPanel textArea = new JPanel();
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
         textArea.add(rullatirullaa);
+        textArea.setBackground(Color.LIGHT_GRAY);
 
         //test.add(rullatirullaa);
         test.add(textArea);
