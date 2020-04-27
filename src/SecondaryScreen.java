@@ -191,26 +191,58 @@ public class SecondaryScreen {
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel title = new JLabel(selectedTitleName);
-        panel.add(title);
+        JLabel titleIs = new JLabel("Nimike: ");
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.LINE_AXIS));
+        titlePanel.add(titleIs);
+        titlePanel.add(title);
+        panel.add(titlePanel);
+        //panel.add(title);
+
         JLabel category = new JLabel(selectedTitleCategory);
+        JLabel categoryIs = new JLabel("Kategoria: ");
+        JPanel categoryPanel = new JPanel();
+        categoryPanel.setLayout(new BoxLayout(categoryPanel, BoxLayout.LINE_AXIS));
+        categoryPanel.add(categoryIs);
+        categoryPanel.add(category);
+        panel.add(categoryPanel);
+
         JTextField headerfield = new JTextField(1);
         headerfield.setMaximumSize(new Dimension(150,15));
         headerfield.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        JLabel headerIs = new JLabel("Otsikko: ");
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.LINE_AXIS));
+        headerPanel.add(headerIs);
+        headerPanel.add(headerfield);
+        panel.add(headerPanel);
 
         String grades[]={"1","2","3","4","5","6","7","8","9","10"};
         JComboBox grade = new JComboBox(grades);
         grade.setMaximumSize(new Dimension(150,15));
-        JTextArea reviewtext = new JTextArea(30,50);
+        JLabel gradeIs = new JLabel("Arvosana: ");
+        JPanel gradePanel = new JPanel();
+        gradePanel.setLayout(new BoxLayout(gradePanel, BoxLayout.LINE_AXIS));
+        gradePanel.add(gradeIs);
+        gradePanel.add(grade);
+        panel.add(gradePanel);
+
+
+        JTextArea reviewtext = new JTextArea(20,50);
         //reviewtext.setMaximumSize(new Dimension(350, 500)); //500 500
         //reviewtext.setPreferredSize(new Dimension(350,500));
         reviewtext.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        reviewtext.setWrapStyleWord(true);
+        reviewtext.setLineWrap(true);
 
         JScrollPane rullatirullaa = new JScrollPane(reviewtext);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        JPanel textArea = new JPanel();
+        /*JPanel textArea = new JPanel();
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
-        textArea.add(rullatirullaa);
+        textArea.add(rullatirullaa);*/
+        //panel.add(textArea);
+        panel.add(rullatirullaa);
 
         JButton plusmedia = new JButton("+Media");
         plusmedia.setAlignmentX(addwindow.CENTER_ALIGNMENT);
@@ -218,12 +250,12 @@ public class SecondaryScreen {
         //JButton savebutton = new JButton("Tallenna");
         //JButton cancelbutton = new JButton("Peru");
 
-        panel.add(category);
-        panel.add(headerfield);
-        panel.add(grade);
+        //panel.add(category);
+        //panel.add(headerfield);
+        //panel.add(grade);
         //panel.add(reviewtext);
         //panel.add(rullatirullaa);
-        panel.add(textArea);
+
         panel.add(plusmedia);
 
         panel.setBorder(BorderFactory.createTitledBorder("demo"));
@@ -241,6 +273,31 @@ public class SecondaryScreen {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDateTime reviewtime = LocalDateTime.now();
             String aika = reviewtime.format(dtf);
+
+            if (headerfield.getText().isBlank()) {
+                JPanel noHeader = new JPanel();
+                JLabel noHeaderWarning = new JLabel("Et antanut otsikkoa");
+                noHeader.add(noHeaderWarning);
+                Object[] ok = {"Ok"};
+                JOptionPane.showOptionDialog(null, noHeader,
+                        "Virhe!", JOptionPane.YES_OPTION,
+                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                addwindow.dispose();
+                return;
+            }
+            if (reviewtext.getText().isBlank()) {
+                JPanel noReviewtext = new JPanel();
+                JLabel noReviewTextWarning = new JLabel("Et kirjoittanut arvostelutekstiä");
+                noReviewtext.add(noReviewTextWarning);
+                Object[] ok = {"Ok"};
+                JOptionPane.showOptionDialog(null, noReviewtext,
+                        "Virhe!", JOptionPane.YES_OPTION,
+                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                addwindow.dispose();
+                return;
+            }
+
+
             ReviewPiece uusi = new ReviewPiece(
                     selectedTitleName,
                     selectedTitleCategory,
@@ -251,19 +308,20 @@ public class SecondaryScreen {
 
             JPanel added = new JPanel();
             added.setSize(400,800);
-            JLabel otsikko = new JLabel(headerfield.getText());
+            JLabel otsikko = new JLabel("Arvostelusi lisättiin onnistuneesti");
+            //new JLabel(headerfield.getText());
             int a = uusi.getArvosana();
             String arvo = Integer.toString(a);
             JLabel arvosana = new JLabel(arvo);
             JLabel testi = new JLabel("hei");
 
             added.add(otsikko);
-            added.add(arvosana);
+            //added.add(arvosana);
             //addwindow.add(added);
-            Object[] ok = {"Ok"};
+            /*Object[] ok = {"Ok"};
             JOptionPane.showOptionDialog(null, added,
-                    "Vahvistus", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                    "", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
             arvostelut.add(uusi);
             SaveReviews();
             loadReviews();
@@ -286,8 +344,23 @@ public class SecondaryScreen {
             FileOutputStream file = new FileOutputStream(directory);
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(arvostelut);
+
+            JPanel added = new JPanel();
+            JLabel addedConfirmation = new JLabel("Arvostelusi tallennettiin onnistuneesti");
+            added.add(addedConfirmation);
+            Object[] ok = {"Ok"};
+            JOptionPane.showOptionDialog(null, added,
+                    "", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
         } catch (IOException e){
             e.printStackTrace();
+            JPanel notadded = new JPanel();
+            JLabel notaddedWarning = new JLabel("Arvosteluasi ei voitu lisätä");
+            notadded.add(notaddedWarning);
+            Object[] ok = {"Ok"};
+            JOptionPane.showOptionDialog(null, notadded,
+                    "Virhe", JOptionPane.YES_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
         } //catch (FileNotFoundException e){}
     }
 
@@ -506,6 +579,29 @@ public class SecondaryScreen {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDateTime reviewtime = LocalDateTime.now();
             String aika = reviewtime.format(dtf);
+
+            if (headerfield.getText().isBlank()) {
+                JPanel noHeader = new JPanel();
+                JLabel noHeaderWarning = new JLabel("Et antanut otsikkoa");
+                noHeader.add(noHeaderWarning);
+                Object[] ok = {"Ok"};
+                JOptionPane.showOptionDialog(null, noHeader,
+                        "Virhe!", JOptionPane.YES_OPTION,
+                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                addwindow.dispose();
+                return;
+            }
+            if (reviewtext.getText().isBlank()) {
+                JPanel noReviewtext = new JPanel();
+                JLabel noReviewTextWarning = new JLabel("Et kirjoittanut arvostelutekstiä");
+                noReviewtext.add(noReviewTextWarning);
+                Object[] ok = {"Ok"};
+                JOptionPane.showOptionDialog(null, noReviewtext,
+                        "Virhe!", JOptionPane.YES_OPTION,
+                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                addwindow.dispose();
+                return;
+            }
             /*ReviewPiece uusi = new ReviewPiece(
                     selectedTitleName,
                     selectedTitleCategory,
@@ -529,10 +625,10 @@ public class SecondaryScreen {
             added.add(otsikko);
             added.add(arvosana);
             //addwindow.add(added);
-            Object[] ok = {"Arvostelu muokattiin onnistuneesti"};
+            /*Object[] ok = {"Arvostelu muokattiin onnistuneesti"};
             JOptionPane.showOptionDialog(null, added,
                     "Vahvistus", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
             //arvostelut.add(uusi);
             SaveReviews();
             loadReviews();
@@ -586,6 +682,7 @@ public class SecondaryScreen {
                 //displayPanel.getWidth());
         hehe.setWrapStyleWord(true);
         hehe.setLineWrap(true);
+        hehe.setEditable(false);
         JScrollPane rullatirullaa = new JScrollPane(hehe);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         test.add(Box.createVerticalGlue());
@@ -622,14 +719,15 @@ public class SecondaryScreen {
         //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
         if (result == JOptionPane.NO_OPTION) {
             arvostelut.remove(i);
-            JPanel deletedMessage = new JPanel();
-            JLabel deleted = new JLabel("Arvostelu poistettiin");
+            JPanel deletedReviewPanel = new JPanel();
+            JLabel deletedMessage = new JLabel("Arvostelu poistettiin");
+            deletedReviewPanel.add(deletedMessage);
             Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, deletedMessage,
+            JOptionPane.showOptionDialog(null, deletedReviewPanel,
                     "", JOptionPane.YES_OPTION,
                     JOptionPane.PLAIN_MESSAGE, null, ok, null);
             //arvostelut.add(uusi);
-            SaveReviews();
+            //SaveReviews();
             loadReviews();
             InitializeReviews();
 
