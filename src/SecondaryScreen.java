@@ -460,10 +460,13 @@ public class SecondaryScreen {
 
         JButton delete = new JButton("Poista arvostelu");
         delete.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        //delete.addActionListener((event) -> deleteReview(i));
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteReview(i);
+                Window w = SwingUtilities.getWindowAncestor(delete);
+                if(w != null) { w.dispose(); }
             }
         });
 
