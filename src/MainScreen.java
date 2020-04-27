@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.io.File;
 
 // Luokka päänäkymälle
 public class MainScreen extends JFrame {
@@ -168,15 +169,21 @@ public class MainScreen extends JFrame {
 
         Object[] optionsButtons = {"Tallenna", "Peruuta"};
 
+        //Luodaan options dialogi
         JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
     }
 
+
+    //Luo lisää nimike ikkunan
+    //Ikkunassa luodaan uusi nimike, antamalla sille nimi ja kategoria
+    //Tämä metodi ei luo uutta nimikettä itse vaan...
+    //Kutsuu createEntertainmentPiece metodia nimikkeen luomiseksi
     private void addNewTitle(){
 
-        JTextField titleName = new JTextField();
+        JTextField titleName = new JTextField("Nimi...");
 
         JLabel nameLabel = new JLabel("Syötä nimi:");
-        JLabel categoryLabel = new JLabel("Valitse nimikkeen kategoria:");
+        JLabel categoryLabel = new JLabel("Valitse kategoria:");
         JPanel titlePanel = new JPanel();
 
         String[] categories = {"Lautapelit", "Kirjat", "Elokuvat", "Roolipelit", "Videopelit"};
@@ -192,7 +199,6 @@ public class MainScreen extends JFrame {
         titlePanel.add(categoryChoice);
 
         int optionResult = JOptionPane.showOptionDialog(null, titlePanel, "Uusi nimike", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, null);
-        //JOptionPane.showInputDialog(null, "Syötä nimikkeeseen liittyvät tiedot", "Uusi nimike", JOptionPane.PLAIN_MESSAGE, null, categories, "Kirjat");
         if(optionResult == JOptionPane.YES_OPTION){
             String name = titleName.getText();
             String categ = (String) categoryChoice.getSelectedItem();
@@ -208,8 +214,12 @@ public class MainScreen extends JFrame {
     //Luo myös paneelin viihdenimikkeelle, joka lisätään sitten päänäkymään
     public void createEntertainmentPiece(String name, String category) {
 
-        boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
+        //regex joka sallii vain alphanumeriset merkit tiedostonimeen
+        boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9äöÄÖ ].*$");
 
+        //Tarkastaa sisältääkä tiedostonimi ei-aplhanumerisia merkkejä
+        //Jos ei sisällä, tarkastetaan ettei saman nimistä nimikettä ole jo listalla
+        //Jos on, perutaan nimikkeen luominen. Muuten luodaan se ja lisätään näkyviin päänäkymään
         if (!hasNonAlpha) {
             if (!entertainmentNameArray.contains(name)) {
                 entertainmentNameArray.add(name);
@@ -232,15 +242,17 @@ public class MainScreen extends JFrame {
         JLabel epCateg = new JLabel();
         JButton openButton = new JButton("Avaa");
 
+        //Avaa -napin action listener. Avaa kysyisen nimikkeen tiedoilla arvostelulistanäkymän
         openButton.addActionListener(event -> {
             SecondaryScreen sec = new SecondaryScreen(ep.getEntertainmentName(),
                     ep.getCategory());
         });
 
+        //Muokkaa nappi, avaa ikkunan, jossa voi muokata nimikkeen tietoja (nimi & kategoria)
         JButton editButton = new JButton("Muokkaa");
-        //editButton.addActionListener(event -> editButtonPushed());
+        editButton.addActionListener(event -> editButtonPushed(ep, epName, epCateg));
 
-        //BoxLayout toistaiseksi
+        //BoxLayout toistaiseksi, muutetaan jos deadlineen jää aikaa
         epPanel.setLayout(new BoxLayout(epPanel, BoxLayout.LINE_AXIS));
         //epPanel.setLayout(new GridBagLayout());
         //GridBagConstraints gbc = new GridBagConstraints();
@@ -259,25 +271,32 @@ public class MainScreen extends JFrame {
         epPanel.add(editButton);
         epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
 
+        //revalidate & repaint, jotta paneeli päivittyy runtime
         titlesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         titlesPanel.add(epPanel);
         titlesPanel.revalidate();
         titlesPanel.repaint();
     }
 
+    //Tallentaa nimikkeet omiin .ser tiedostoihinsa, jotta ne voidaan myöhemmin ladata uudelleen
+    //Kirjoittaa myös epArray.txt tiedoston, johon tulee jokaisen nimikkeen nimi
+    //epArray.txt avulla tiedetään myöhemmin minkä nimisiä tiedostoja pitäisi avata
     public void saveEntertainmentPiece (EntertainmentPiece ep) {
+        //Yritetään kirjoittaa entertainmentPiece olion tiedot tiedostoon...
         try {
-            String entertainmentFile = "\\" + ep.getEntertainmentName() + ".ser";
+            String entertainmentFile = File.separator + File.separator + ep.getEntertainmentName() + ".ser";
             String directory = System.getProperty("user.dir") + entertainmentFile;
             System.out.println(directory);
             FileOutputStream file = new FileOutputStream(directory);
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(ep);
+            out.close();
 
         } catch (IOException e){
             e.printStackTrace();
-        } //catch (FileNotFoundException e){}
+        }
 
+        //Kirjoitetaan (ja luodaan) epArray.txt, johon lisätään edellä luotu EP
         try {
             FileWriter fw = new FileWriter("epArray.txt");
             BufferedWriter br = new BufferedWriter(fw);
@@ -291,7 +310,13 @@ public class MainScreen extends JFrame {
         }
     }
 
+    // Lukee nimikelistan ja listan avulla avaa nimikkeiden tiedostot
+    // Luo nimikelistan päänäkymään createEPBox metodin avulla käyttämällä luettuja EP tiedostoja
     public void loadEntertainmentPieces() {
+        //Luetaan epArray.txt tiedostosta minkä nimisiä nimikkeitä ohjelmassa pitäisi näkyä
+
+        //LISÄÄ: JOS TIEDOSTO ON OLEMASSA
+
         EntertainmentPiece temp = new EntertainmentPiece("","");
         try {
             BufferedReader br = new BufferedReader(new FileReader("epArray.txt"));
@@ -301,11 +326,14 @@ public class MainScreen extends JFrame {
             }
             br.close();
 
+            //Luetaan jokaisen nimikkeen mukainen .ser tiedosto, jossa on nimikkeeseen liittyvä olio
+            //Luodaan jokaisesta nimikkeestä nimilistaan olio
             for (String piece : entertainmentNameArray) {
-                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\" + piece + ".ser");
+                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + File.separator + piece + ".ser");
                 ObjectInputStream objin = new ObjectInputStream(fis);
                 try {
                     temp = (EntertainmentPiece) objin.readObject();
+                    objin.close();
                 } catch (ClassNotFoundException cnfe) {
                     cnfe.printStackTrace();
                 }
@@ -315,5 +343,79 @@ public class MainScreen extends JFrame {
             e.printStackTrace();
         }
     }
-}
 
+    //Metodi, joka käsittelee edit buttonin painamisen päänäkymässä
+    //Ottaa syötteenä ep:n, jonka edit buttonia painetaan.
+    //Avaa ikkunan, jossa eptä voi muokata. Antaa myös mahdollisuuden poistaa ep.
+    //Metodi antaa myös muuttaa epn nimen ja kategorian
+    private void editButtonPushed(EntertainmentPiece ep, JLabel oldNameLabel, JLabel oldCategLabel ){
+
+        JTextField epName = new JTextField(ep.getEntertainmentName());
+        JLabel nimiLabel = new JLabel("Syötä nimi:", SwingConstants.CENTER);
+        JLabel categLabel = new JLabel("Valitse kategoria:", SwingConstants.CENTER);
+        JPanel editPanel = new JPanel();
+        String categories[] = {"Lautapelit", "Kirjat", "Elokuvat", "Roolipelit", "Videopelit"};
+        JButton deleteButton = new JButton("Poista tämä nimike");
+        //deleteButton.addActionListener(event -> deleteEntertainmentPiece());
+
+        JComboBox<String> categBox = new JComboBox<>(categories);
+        Object[] optionsButtons = {"Tallenna muutokset", "Peruuta"};
+
+        String oldEPName = ep.getEntertainmentName();
+        String oldEPCat = ep.getCategory();
+        String temp = ("Olet muokkaamassa nimikettä " + oldEPName + " (" + oldEPCat + ")");
+        JLabel oldData = new JLabel(temp);
+
+        editPanel.setLayout(new GridLayout(3,2));
+        editPanel.add(nimiLabel);
+        editPanel.add(epName);
+        editPanel.add(categLabel);
+        editPanel.add(categBox);
+        editPanel.add(oldData);
+        editPanel.add(deleteButton);
+
+        int optionResult = JOptionPane.showOptionDialog(null, editPanel, "Muokkaa nimikettä", JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, optionsButtons, null);
+
+        if (optionResult == JOptionPane.YES_OPTION){
+            String newName = epName.getText();
+            String newCateg = (String) categBox.getSelectedItem();
+            if(newName != null && !newName.isEmpty()){
+                boolean hasNonAlpha = newName.matches("^.*[^a-zA-Z0-9äöÄÖ ].*$");
+
+                if(!hasNonAlpha) {
+                    entertainmentNameArray.remove(new String(oldEPName));
+                    entertainmentNameArray.add(newName);
+
+                    ep.setEntertainmentName(newName);
+                    ep.setCategory(newCateg);
+
+                    try{
+                        File file = new File(System.getProperty("user.dir"));
+                        String fullFileName = File.separator + File.separator + oldEPName + ".ser";
+                        File fileToDelete = new File(file, fullFileName);
+                        saveEntertainmentPiece(ep);
+
+                        if(!fileToDelete.delete()){
+                            JOptionPane.showMessageDialog(null, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    oldNameLabel.setText(newName);
+                    oldCategLabel.setText("Kategoria: " + newCateg);
+
+                    titlesPanel.revalidate();
+                    titlesPanel.repaint();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen." +
+                            "\nKokeile uutta nimeä.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!" +
+                        "\nHaluamaasi muokkausta ei nyt tehty.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+}
