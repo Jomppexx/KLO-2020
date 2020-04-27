@@ -1,8 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 // Luokka päänäkymälle
@@ -70,6 +74,10 @@ public class MainScreen extends JFrame {
         String[] sortingOptions = {"Aakkosjärjestys", "Uusimmat", "Kategorioittain", "Vanhimmat"};
         JComboBox<String> sortingDrop = new JComboBox<>(sortingOptions);
         sortingDrop.setSize(20,10);
+
+        sortingDrop.addActionListener((ActionListener) (event) -> {
+            sortEPBoxes(sortingDrop.getSelectedItem());
+        });
 
         toolsPanel.add(Box.createHorizontalGlue());
         toolsPanel.add(searchPlaceholder);
@@ -169,7 +177,8 @@ public class MainScreen extends JFrame {
         Object[] optionsButtons = {"Tallenna", "Peruuta"};
 
         //Luodaan options dialogi
-        JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
+        JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
     }
 
 
@@ -397,43 +406,49 @@ public class MainScreen extends JFrame {
 
         deleteButton.addActionListener(event -> {
 
-            File file = new File(System.getProperty("user.dir"));
-            String fullFileName = File.separator + oldNameLabel.getText() + ".ser";
-            File fileToDelete = new File(file, fullFileName);
+            String[] warningOptions = {"Kyllä", "Ei"};
+            int optionResult = JOptionPane.showOptionDialog(null, ("Haluatko varmasti poistaa nimikkeen " + oldEPName + "?"),
+                    "Varoitus!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, warningOptions, null);
 
-            if(!fileToDelete.delete()){
-                JOptionPane.showMessageDialog(null, "Poistaminen ei onnistunut...",
-                        "Varoitus", JOptionPane.ERROR_MESSAGE);
-            } else {
+            if(optionResult == JOptionPane.YES_OPTION) {
+                File file = new File(System.getProperty("user.dir"));
+                String fullFileName = File.separator + oldNameLabel.getText() + ".ser";
+                File fileToDelete = new File(file, fullFileName);
 
-                entertainmentNameArray.remove(oldEPName);
-                writeEPArrayTxt();
-                titlesPanel.removeAll();
+                if (!fileToDelete.delete()) {
+                    JOptionPane.showMessageDialog(null, "Poistaminen ei onnistunut...",
+                            "Varoitus", JOptionPane.ERROR_MESSAGE);
+                } else {
 
-                for (String piece : entertainmentNameArray) {
-                    try {
-                        //LISÄÄ FILE OLEMASSAOLO CHECK
-                        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
-                        ObjectInputStream objin = new ObjectInputStream(fis);
+                    entertainmentNameArray.remove(oldEPName);
+                    writeEPArrayTxt();
+                    titlesPanel.removeAll();
+
+                    for (String piece : entertainmentNameArray) {
                         try {
-                            temp.set((EntertainmentPiece) objin.readObject());
-                            objin.close();
-                        } catch (ClassNotFoundException cnfe) {
-                            cnfe.printStackTrace();
+                            //LISÄÄ FILE OLEMASSAOLO CHECK
+                            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
+                            ObjectInputStream objin = new ObjectInputStream(fis);
+                            try {
+                                temp.set((EntertainmentPiece) objin.readObject());
+                                objin.close();
+                            } catch (ClassNotFoundException cnfe) {
+                                cnfe.printStackTrace();
+                            }
+
+                            buildEPBox(temp.get());
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
 
-                        buildEPBox(temp.get());
-
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
                     }
-
-                }
-                titlesPanel.revalidate();
-                titlesPanel.repaint();
-                Window w = SwingUtilities.getWindowAncestor(deleteButton);
-                if(w != null) {
-                    w.dispose();
+                    titlesPanel.revalidate();
+                    titlesPanel.repaint();
+                    Window w = SwingUtilities.getWindowAncestor(deleteButton);
+                    if (w != null) {
+                        w.dispose();
+                    }
                 }
             }
         });
@@ -463,12 +478,12 @@ public class MainScreen extends JFrame {
                         File file = new File(System.getProperty("user.dir"));
                         String fullFileName = File.separator + oldEPName + ".ser";
                         File fileToDelete = new File(file, fullFileName);
-                        saveEntertainmentPiece(ep);
 
                         if(!fileToDelete.delete()){
                             JOptionPane.showMessageDialog(null, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...",
                                     "Varoitus", JOptionPane.ERROR_MESSAGE);
                         }
+                        saveEntertainmentPiece(ep);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -487,5 +502,46 @@ public class MainScreen extends JFrame {
                         "\nHaluamaasi muokkausta ei nyt tehty.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
             }
         }
+    }
+
+    private void sortEPBoxes(Object selected){
+        String selectedItem = selected.toString();
+        EntertainmentPiece temp = new EntertainmentPiece("", "");
+
+
+        switch(selectedItem){
+
+            case "Aakkosjärjestys":
+
+                Collections.sort(entertainmentNameArray, String.CASE_INSENSITIVE_ORDER);
+                titlesPanel.removeAll();
+                for (String piece : entertainmentNameArray) {
+                    try {
+                        //LISÄÄ FILE OLEMASSAOLO CHECK
+                        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
+                        ObjectInputStream objin = new ObjectInputStream(fis);
+                        try {
+                            temp = ((EntertainmentPiece) objin.readObject());
+                            objin.close();
+                        } catch (ClassNotFoundException cnfe) {
+                            cnfe.printStackTrace();
+                        }
+
+                        buildEPBox(temp);
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                titlesPanel.revalidate();
+                titlesPanel.repaint();
+                break;
+
+            case "Kategorioittain":
+
+                break;
+        }
+
     }
 }
