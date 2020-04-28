@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MainScreen extends JFrame {
 
     private ArrayList <String> entertainmentNameArray = new ArrayList<>();
-    private JFrame mainFrame;
+    public ArrayList <EntertainmentPiece> epArray = new ArrayList<>();
+    public JFrame mainFrame;
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
     private JPanel titlesPanel; //paneeli nimikelistalle, josta pääsee arvosteluihin
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
@@ -64,6 +65,7 @@ public class MainScreen extends JFrame {
 
         // Nappi uusien nimikkeiden (elokuvat, kirjat, ym.) lisäämistä varten
         JButton newTitleButton = new JButton("Lisää nimike");
+
         toolsPanel.add(Box.createRigidArea(new Dimension(15,0)));
         toolsPanel.add(newTitleButton, BorderLayout.LINE_START);
         newTitleButton.addActionListener((event) -> addNewTitle());
@@ -71,7 +73,7 @@ public class MainScreen extends JFrame {
         JLabel sortLabel = new JLabel("Sorttaa:");
         JLabel searchPlaceholder = new JLabel("Hakupalkin placeholder");
 
-        String[] sortingOptions = {"Aakkosjärjestys", "Uusimmat", "Kategorioittain", "Vanhimmat"};
+        String[] sortingOptions = {"Aakkosjärjestys", "Kategorioittain"};
         JComboBox<String> sortingDrop = new JComboBox<>(sortingOptions);
         sortingDrop.setSize(20,10);
 
@@ -142,12 +144,8 @@ public class MainScreen extends JFrame {
         JFrame helpFrame = new JFrame("Apua ja infoa");
         helpFrame.setSize(600, 440);
 
-        // Paneeli frameen. setLocationRelativeTo(null [object]) keskittää ikkunan
-        JPanel helpPanel = new JPanel();
-        helpFrame.setLocationRelativeTo(null);
-
         // JOptionPane dialogi, parempi kuin pelkkä frame/pane systeemi, koska vaatii fokuksen siihen asti että ikkuna suljetaan
-        JOptionPane.showMessageDialog(helpFrame, helpContent, "Apua ja infoa", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(mainFrame, helpContent, "Apua ja infoa", JOptionPane.PLAIN_MESSAGE);
     }
 
     // Avaa options dialogin kun options nappia painetaan menussa
@@ -177,7 +175,7 @@ public class MainScreen extends JFrame {
         Object[] optionsButtons = {"Tallenna", "Peruuta"};
 
         //Luodaan options dialogi
-        JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION,
+        JOptionPane.showOptionDialog(mainFrame, optionsPanel, "Options", JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
     }
 
@@ -206,14 +204,15 @@ public class MainScreen extends JFrame {
         titlePanel.add(categoryLabel);
         titlePanel.add(categoryChoice);
 
-        int optionResult = JOptionPane.showOptionDialog(null, titlePanel, "Uusi nimike", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, null);
+        int optionResult = JOptionPane.showOptionDialog(mainFrame, titlePanel, "Uusi nimike", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, null);
         if(optionResult == JOptionPane.YES_OPTION){
             String name = titleName.getText();
             String categ = (String) categoryChoice.getSelectedItem();
             if(name != null && !name.isEmpty()){
                 createEntertainmentPiece(name, categ);
             }else{
-                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!\nHaluamaasi nimikettä ei nyt luotu.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Et syöttänyt nimikkeelle nimeä!\nHaluamaasi nimikettä ei nyt luotu.",
+                        "Varoitus!", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
@@ -232,14 +231,15 @@ public class MainScreen extends JFrame {
             if (!entertainmentNameArray.contains(name)) {
                 entertainmentNameArray.add(name);
                 EntertainmentPiece ep = new EntertainmentPiece(name, category);
-                JOptionPane.showMessageDialog(null, "Haluamasi nimike luotiin onnistuneesti.");
+                JOptionPane.showMessageDialog(mainFrame, "Haluamasi nimike luotiin onnistuneesti.");
                 saveEntertainmentPiece(ep);
                 buildEPBox(ep);
+                epArray.add(ep);
             } else {
-                JOptionPane.showMessageDialog(null, "Samalla nimellä tehty nimike löytyy jo.\nNimikettä ei luotu.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, "Samalla nimellä tehty nimike löytyy jo.\nNimikettä ei luotu.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen.\nKokeile uutta nimeä.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen.\nKokeile uutta nimeä.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -252,8 +252,9 @@ public class MainScreen extends JFrame {
 
         //Avaa -napin action listener. Avaa kysyisen nimikkeen tiedoilla arvostelulistanäkymän
         openButton.addActionListener(event -> {
-            SecondaryScreen sec = new SecondaryScreen(ep.getEntertainmentName(),
+            SecondaryScreen sec = new SecondaryScreen(mainFrame, ep.getEntertainmentName(),
                     ep.getCategory());
+            mainFrame.setVisible(false);
         });
 
         //Muokkaa nappi, avaa ikkunan, jossa voi muokata nimikkeen tietoja (nimi & kategoria)
@@ -355,13 +356,13 @@ public class MainScreen extends JFrame {
                 File fileToCheck = new File(EPfile, fullFileName);
 
                 if(!fileToCheck.isFile()) {
-                    JOptionPane.showMessageDialog(null, (piece + " nimistä .ser tiedostoa ei löytynyt... (loadEntertainmentPieces"),
+                    JOptionPane.showMessageDialog(mainFrame, (piece + " nimistä .ser tiedostoa ei löytynyt... (loadEntertainmentPieces"),
                             "Varoitus", JOptionPane.WARNING_MESSAGE);
                 } else {
-
                     try {
                         temp = (EntertainmentPiece) objin.readObject();
                         objin.close();
+                        epArray.add(temp);
                     } catch (ClassNotFoundException cnfe) {
                         cnfe.printStackTrace();
                     }
@@ -385,7 +386,7 @@ public class MainScreen extends JFrame {
         JLabel nimiLabel = new JLabel("Syötä nimi:", SwingConstants.CENTER);
         JLabel categLabel = new JLabel("Valitse kategoria:", SwingConstants.CENTER);
         JPanel editPanel = new JPanel();
-        String categories[] = {"Lautapelit", "Kirjat", "Elokuvat", "Roolipelit", "Videopelit"};
+        String[] categories = {"Lautapelit", "Kirjat", "Elokuvat", "Roolipelit", "Videopelit"};
         JButton deleteButton = new JButton("Poista tämä nimike");
         String oldEPName = ep.getEntertainmentName();
         String oldEPCat = ep.getCategory();
@@ -404,44 +405,60 @@ public class MainScreen extends JFrame {
         editPanel.add(oldData);
         editPanel.add(deleteButton);
 
+        //Delete napin toiminnallisuudelle lambda
         deleteButton.addActionListener(event -> {
 
+            //Varmistetaan käyttäjältä että valittu nimike halutaan poistaa
             String[] warningOptions = {"Kyllä", "Ei"};
-            int optionResult = JOptionPane.showOptionDialog(null, ("Haluatko varmasti poistaa nimikkeen " + oldEPName + "?"),
+            int optionResult = JOptionPane.showOptionDialog(mainFrame, ("Haluatko varmasti poistaa nimikkeen " + oldEPName + "?"),
                     "Varoitus!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, warningOptions, null);
 
+            //Jos hyväksytään, poistetaan
             if(optionResult == JOptionPane.YES_OPTION) {
                 File file = new File(System.getProperty("user.dir"));
                 String fullFileName = File.separator + oldNameLabel.getText() + ".ser";
                 File fileToDelete = new File(file, fullFileName);
 
                 if (!fileToDelete.delete()) {
-                    JOptionPane.showMessageDialog(null, "Poistaminen ei onnistunut...",
+                    JOptionPane.showMessageDialog(mainFrame, "Poistaminen ei onnistunut...",
                             "Varoitus", JOptionPane.ERROR_MESSAGE);
                 } else {
 
+                    //Jos tiedoston poistaminen onnistuu
+                    //Poistetaan nimi myös nameArraylta ja epArraylta
                     entertainmentNameArray.remove(oldEPName);
+                    epArray.remove(ep);
                     writeEPArrayTxt();
                     titlesPanel.removeAll();
 
+                    //Luetaan nameArraylta nimikeiden nimet ja tehdään niitä vastaavilla tiedostoilla epBoxit päänäkymään uudelleen
+                    //Estää turhien tyhjien välien syntymistä päänäkymän listassa
+                    //Lista tyhjennetään ensin kokonaan, sitten tehdään uudelleen
                     for (String piece : entertainmentNameArray) {
                         try {
-                            //LISÄÄ FILE OLEMASSAOLO CHECK
-                            FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
-                            ObjectInputStream objin = new ObjectInputStream(fis);
-                            try {
-                                temp.set((EntertainmentPiece) objin.readObject());
-                                objin.close();
-                            } catch (ClassNotFoundException cnfe) {
-                                cnfe.printStackTrace();
+                            //Tarkistetaan että haluttu file on olemassa
+                            String fil = File.separator + piece + ".ser";
+                            File fileToCheck = new File(file, fil);
+
+                            if(!fileToCheck.isFile()) {
+                                JOptionPane.showMessageDialog(mainFrame, (piece + " nimistä .ser tiedostoa ei löytynyt... (editButtonPushed)"),
+                                        "Varoitus", JOptionPane.WARNING_MESSAGE);
+                            }else {
+
+                                FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
+                                ObjectInputStream objin = new ObjectInputStream(fis);
+                                try {
+                                    temp.set((EntertainmentPiece) objin.readObject());
+                                    objin.close();
+                                } catch (ClassNotFoundException cnfe) {
+                                    cnfe.printStackTrace();
+                                }
+
+                                buildEPBox(temp.get());
                             }
-
-                            buildEPBox(temp.get());
-
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-
                     }
                     titlesPanel.revalidate();
                     titlesPanel.repaint();
@@ -453,7 +470,7 @@ public class MainScreen extends JFrame {
             }
         });
 
-        int optionResult = JOptionPane.showOptionDialog(null, editPanel, "Muokkaa nimikettä", JOptionPane.YES_NO_OPTION,
+        int optionResult = JOptionPane.showOptionDialog(mainFrame, editPanel, "Muokkaa nimikettä", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, optionsButtons, null);
 
         //Jos käyttäjä painaa YES_OPTIOTA eli Tallenna muutokset nappia
@@ -467,20 +484,23 @@ public class MainScreen extends JFrame {
                 if(!hasNonAlpha) {
                     //Poistetaan vanhan nimikkeen tiedot listalta ja lisätään uusi nimi
                     entertainmentNameArray.remove(oldEPName);
+                    epArray.remove(ep);
                     entertainmentNameArray.add(newName);
 
-                    //Muutetaan nimikkeolion tiedot uusiksi
+                    //Muutetaan nimikeolion tiedot uusiksi
                     ep.setEntertainmentName(newName);
                     ep.setCategory(newCateg);
+                    epArray.add(ep);
 
-                    //Yritetään lukea "nimike".ser tiedostosta jossa ohjelma runnataan
+                    //Yritetään lukea "nimike".ser tiedostosta
+                    //.serin tulee olla samassa hakemistossa kuin mistä ohjelma ajetaan
                     try{
                         File file = new File(System.getProperty("user.dir"));
                         String fullFileName = File.separator + oldEPName + ".ser";
                         File fileToDelete = new File(file, fullFileName);
 
                         if(!fileToDelete.delete()){
-                            JOptionPane.showMessageDialog(null, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...",
+                            JOptionPane.showMessageDialog(mainFrame, "Vanhan nimikkeen tiedoston poistaminen ei onnistunut...",
                                     "Varoitus", JOptionPane.ERROR_MESSAGE);
                         }
                         saveEntertainmentPiece(ep);
@@ -494,16 +514,17 @@ public class MainScreen extends JFrame {
                     titlesPanel.revalidate();
                     titlesPanel.repaint();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen." +
+                    JOptionPane.showMessageDialog(mainFrame, "Nimikkeen nimessä merkkejä, jotka eivät kelpaa tiedostonimeen." +
                             "\nKokeile uutta nimeä.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(null, "Et syöttänyt nimikkeelle nimeä!" +
+                JOptionPane.showMessageDialog(mainFrame, "Et syöttänyt nimikkeelle nimeä!" +
                         "\nHaluamaasi muokkausta ei nyt tehty.", "Varoitus!", JOptionPane.WARNING_MESSAGE);
             }
         }
     }
 
+    //Järjestelee päänäkymässä näkyvät nimikkeet erilaisiin järjestyksiin pudotusvalikon mukaisesti
     private void sortEPBoxes(Object selected){
         String selectedItem = selected.toString();
         EntertainmentPiece temp = new EntertainmentPiece("", "");
@@ -511,13 +532,13 @@ public class MainScreen extends JFrame {
 
         switch(selectedItem){
 
+            //Lajittelee ja tulostaa nimikkeet aakkosjärjestyksessä päänäkymään
             case "Aakkosjärjestys":
 
-                Collections.sort(entertainmentNameArray, String.CASE_INSENSITIVE_ORDER);
+                entertainmentNameArray.sort(String.CASE_INSENSITIVE_ORDER);
                 titlesPanel.removeAll();
                 for (String piece : entertainmentNameArray) {
                     try {
-                        //LISÄÄ FILE OLEMASSAOLO CHECK
                         FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + File.separator + piece + ".ser");
                         ObjectInputStream objin = new ObjectInputStream(fis);
                         try {
@@ -526,9 +547,7 @@ public class MainScreen extends JFrame {
                         } catch (ClassNotFoundException cnfe) {
                             cnfe.printStackTrace();
                         }
-
                         buildEPBox(temp);
-
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -538,10 +557,17 @@ public class MainScreen extends JFrame {
                 titlesPanel.repaint();
                 break;
 
+                //Järjestää nimikkeet kategorian perusteella ja tulostaa ne uudessa järjestyksessä päänäkymään
             case "Kategorioittain":
 
+                epArray.sort(Comparator.comparing(EntertainmentPiece::getCategory));
+                titlesPanel.removeAll();
+                for(EntertainmentPiece ep : epArray) {
+                    buildEPBox(ep);
+                }
+                titlesPanel.revalidate();
+                titlesPanel.repaint();
                 break;
         }
-
     }
 }

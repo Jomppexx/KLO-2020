@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
@@ -15,15 +17,16 @@ public class SecondaryScreen {
     public String selectedTitleName;
     public String selectedTitleCategory;
     //private JDialog secscreen;
+    private JFrame mainScrFrame; //Frame, jotta nimikelistanäkymänä voidaan manipuloida
     private JFrame secondaryFrame; //pääikkuna arvostelujen hallinnoimiselle
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
-    private JPanel titlesPanel; //paneeli nimikelistalle, josta pääsee arvosteluihin
+    private JPanel titlesPanel; //paneeli arvostelulistalle
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
 
-    public SecondaryScreen(String title, String category){
+    public SecondaryScreen(JFrame mainScreenFrame, String title, String category){
+        mainScrFrame = mainScreenFrame;
         selectedTitleName = title;
         selectedTitleCategory = category;
-        //loadReviews();
         loadReviews();
         MakeWindow();
         buildMenuBar();
@@ -37,7 +40,16 @@ public class SecondaryScreen {
         //secscreen.setSize(1200, 800);
         //secscreen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         secondaryFrame.setSize(1200,800);
-        secondaryFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        secondaryFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        secondaryFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent event){
+                mainScrFrame.setVisible(true);
+                secondaryFrame.dispose();
+            }
+        });
 
         JPanel upperPanel = new JPanel();
         upperPanel.setBackground(Color.LIGHT_GRAY);
@@ -75,7 +87,7 @@ public class SecondaryScreen {
         JLabel title = new JLabel (selectedTitleName);
         toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
-        JLabel kategoria = new JLabel (selectedTitleCategory);
+        JLabel kategoria = new JLabel ("Kategoria: " + selectedTitleCategory);
         toolsPanel.add(kategoria);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
         toolsPanel.add(Box.createHorizontalGlue());
@@ -83,8 +95,8 @@ public class SecondaryScreen {
 
         //Tehdään hakemistoiminto
         JLabel hakuehdot = new JLabel("Rajoita hakua:");
-        String hakutermit[]={"Uusin", "Tekijä", "Arvosana"};
-        JComboBox sortby = new JComboBox(hakutermit);
+        String[] hakutermit={"Uusin", "Arvosana"};
+        JComboBox<String> sortby = new JComboBox<>(hakutermit);
         sortby.setSize(20,10);
         toolsPanel.add(hakuehdot);
         toolsPanel.add(sortby);
@@ -96,31 +108,37 @@ public class SecondaryScreen {
                 AddReview();
             }
         });
-        toolsPanel.add(newReview);
+        //toolsPanel.add(newReview);
 
+        JButton backButton = new JButton("Palaa");
+        backButton.setOpaque(false);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.setContentAreaFilled(false);
+        backButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 
         upperPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
+        c.gridx = 1;
         c.gridy = 0;
         c.weightx = 0.5;
         c.ipady = 10;
         upperPanel.add(title, c);
 
-        c.gridx = 0;
+        c.gridx = 1;
         c.gridy = 1;
         upperPanel.add(kategoria, c);
 
         c.gridx = 3;
-        c.gridy = 0;
-        c.gridheight = 2;
+        c.gridy = 1;
+        c.gridheight = 1;
         c.gridwidth = 1;
         c.ipady = 40;
-        c.ipadx = 40;
-        c.weightx = 0;
-        c.weighty = 1;
+        c.ipadx = 0;
+        c.weightx = 0.5;
+        c.weighty = 0.5;
         c.fill = GridBagConstraints.BOTH;
         upperPanel.add(newReview);
 
@@ -144,6 +162,7 @@ public class SecondaryScreen {
 
         //secscreen.add(mainSplitPane);
         secondaryFrame.add(mainSplitPane);
+        secondaryFrame.setLocationRelativeTo(null);
         secondaryFrame.setVisible(true);
         //secscreen.setVisible(true);
         mainSplitPane.setDividerLocation(0.07);
@@ -260,11 +279,10 @@ public class SecondaryScreen {
         optionsPanel.add(ratingsLabel);
         optionsPanel.add(disableRatings);
 
-
         Object[] optionsButtons = {"Tallenna", "Peruuta"};
 
         //Luodaan options dialogi
-        JOptionPane.showOptionDialog(null, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
+        JOptionPane.showOptionDialog(secondaryFrame, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
     }
 
     private void AddReview() {
@@ -310,8 +328,8 @@ public class SecondaryScreen {
         headerPanel.setBackground(Color.LIGHT_GRAY);
         panel.add(headerPanel);
 
-        String grades[]={"1","2","3","4","5","6","7","8","9","10"};
-        JComboBox grade = new JComboBox(grades);
+        String[] grades={"1","2","3","4","5","6","7","8","9","10"};
+        JComboBox<String> grade = new JComboBox<>(grades);
         grade.setMaximumSize(new Dimension(150,15));
         JLabel gradeIs = new JLabel("Arvosana: ");
         JPanel gradePanel = new JPanel();
@@ -357,23 +375,23 @@ public class SecondaryScreen {
         addwindow.add(panel);*/
         //addwindow.setVisible(true);
 
-        Object[] savecancelbuttons = {"Peru", "Tallenna"};
-        int result = JOptionPane.showOptionDialog(null, panel,
+        Object[] savecancelbuttons = {"Tallenna", "Peruuta"};
+        int result = JOptionPane.showOptionDialog(secondaryFrame, panel,
                 "Uusi arvostelu", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
         //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi on oikeasti "EI" eli NO-nappi
         //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
-        if(result == JOptionPane.NO_OPTION){
+        if(result == JOptionPane.YES_OPTION){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDateTime reviewtime = LocalDateTime.now();
-            String aika = reviewtime.format(dtf);
+            LocalDateTime reviewTime = LocalDateTime.now();
+            String aika = reviewTime.format(dtf);
 
             if (headerfield.getText().isBlank()) {
                 JPanel noHeader = new JPanel();
                 JLabel noHeaderWarning = new JLabel("Et antanut otsikkoa");
                 noHeader.add(noHeaderWarning);
                 Object[] ok = {"Ok"};
-                JOptionPane.showOptionDialog(null, noHeader,
+                JOptionPane.showOptionDialog(secondaryFrame, noHeader,
                         "Virhe!", JOptionPane.YES_OPTION,
                         JOptionPane.PLAIN_MESSAGE, null, ok, null);
                 addwindow.dispose();
@@ -383,14 +401,11 @@ public class SecondaryScreen {
                 JPanel noReviewtext = new JPanel();
                 JLabel noReviewTextWarning = new JLabel("Et kirjoittanut arvostelutekstiä");
                 noReviewtext.add(noReviewTextWarning);
-                Object[] ok = {"Ok"};
-                JOptionPane.showOptionDialog(null, noReviewtext,
-                        "Virhe!", JOptionPane.YES_OPTION,
-                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+                JOptionPane.showMessageDialog(secondaryFrame, noReviewtext,
+                        "Virhe!", JOptionPane.ERROR_MESSAGE);
                 addwindow.dispose();
                 return;
             }
-
 
             ReviewPiece uusi = new ReviewPiece(
                     selectedTitleName,
@@ -433,39 +448,51 @@ public class SecondaryScreen {
     public void SaveReviews () {
         try {
             //HUOMIO: INTELLIJ KIRJOITTAA OBJECT.SERIN SRC-KANSION YLEMPÄÄN KANSIOON
-            String directory = System.getProperty("user.dir") + "\\object.ser";
+            String directory = System.getProperty("user.dir") + File.separator + "object.ser";
             System.out.println(directory);
             FileOutputStream file = new FileOutputStream(directory);
             ObjectOutputStream out = new ObjectOutputStream(file);
             out.writeObject(arvostelut);
 
             JPanel added = new JPanel();
-            JLabel addedConfirmation = new JLabel("Arvostelusi tallennettiin onnistuneesti");
+            JLabel addedConfirmation = new JLabel("Muutoksesi tallennettiin onnistuneesti");
             added.add(addedConfirmation);
-            Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, added,
-                    "", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
+
+            JOptionPane.showMessageDialog(titlesPanel, added,
+                    "Muutokset onnistuivat", JOptionPane.PLAIN_MESSAGE);
+
         } catch (IOException e){
             e.printStackTrace();
-            JPanel notadded = new JPanel();
-            JLabel notaddedWarning = new JLabel("Arvosteluasi ei voitu lisätä");
-            notadded.add(notaddedWarning);
-            Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, notadded,
-                    "Virhe", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
+            JPanel notAdded = new JPanel();
+            JLabel notAddedWarning = new JLabel("Muutoksiasi ei voitu tehdä");
+            notAdded.add(notAddedWarning);
+
+            JOptionPane.showMessageDialog(secondaryFrame, notAdded,
+                    "Virhe", JOptionPane.ERROR_MESSAGE);
         } //catch (FileNotFoundException e){}
     }
 
     public void loadReviews() {
-        try {
-            FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
-                    "\\object.ser");
-            ObjectInputStream in = new ObjectInputStream(file);
-            ArrayList<ReviewPiece> temp = new ArrayList<>();
+
+        File userDirFile = new File(System.getProperty("user.dir"));
+        String fullFile = File.separator + "object.ser";
+        File fileToCheck = new File(userDirFile, fullFile);
+
+        if(!fileToCheck.isFile()) {
+            File objSer = new File("object.ser");
             try {
-                temp = (ArrayList<ReviewPiece>) in.readObject();
+                objSer.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
+                        File.separator + "object.ser");
+                ObjectInputStream in = new ObjectInputStream(file);
+                ArrayList<ReviewPiece> temp = new ArrayList<>();
+                try {
+                    temp = (ArrayList<ReviewPiece>) in.readObject();
                 /*for(int i=0;i<temp.size();i++) {
                     ReviewPiece candidant = temp.get(i);
                     if(candidant.getNimike()!=selectedTitleName ||
@@ -474,15 +501,16 @@ public class SecondaryScreen {
                         //i--;
                     }
                 }*/
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
-            }
+                } catch (ClassNotFoundException c) {
+                    c.printStackTrace();
+                }
             /*for(int i=0;i<temp.size();i++){
                 temp.get(i).getvalues();
             }*/
-            this.arvostelut = temp;
-        } catch (IOException e) {
-            e.printStackTrace();
+                this.arvostelut = temp;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -502,10 +530,9 @@ public class SecondaryScreen {
                     JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
 
             //secondary.add(testi);
-            if (arvostelut.get(i).getNimike()!=selectedTitleName ||
-            arvostelut.get(i).getKategoria()!=selectedTitleCategory) {
-
-
+            ReviewPiece temp = arvostelut.get(i);
+            if (temp.getNimike().equals(selectedTitleName) &&
+            temp.getKategoria().equals(selectedTitleCategory)) {
 
             int arvo = arvostelut.get(i).getArvosana();
             String arvosana = Integer.toString(arvo);
@@ -550,9 +577,10 @@ public class SecondaryScreen {
             titlesPanel.add(testi);
             testi.setVisible(true);
             titlesPanel.add(Box.createRigidArea(new Dimension(7,7)));
+            }
+
             titlesPanel.revalidate();
             titlesPanel.repaint();
-            }
             //secondary.pack();
 
             /*secondary.add(testi);
@@ -608,8 +636,8 @@ public class SecondaryScreen {
 
         int arvotemp = temp.getArvosana();
         String arvosanatemp = Integer.toString(arvotemp);
-        String grades[]={"1","2","3","4","5","6","7","8","9","10"};
-        JComboBox grade = new JComboBox(grades);
+        String[] grades={"1","2","3","4","5","6","7","8","9","10"};
+        JComboBox<String> grade = new JComboBox<>(grades);
         grade.setSelectedItem(arvosanatemp);
         grade.setMaximumSize(new Dimension(150,15));
         JTextArea reviewtext = new JTextArea(temp.getArvosteluteksti(),
@@ -666,13 +694,13 @@ public class SecondaryScreen {
         addwindow.add(panel);
         //addwindow.setVisible(true);
 
-        Object[] savecancelbuttons = {"Peru", "Tallenna"};
-        int result = JOptionPane.showOptionDialog(null, panel,
+        Object[] savecancelbuttons = {"Tallenna", "Peruuta"};
+        int result = JOptionPane.showOptionDialog(secondaryFrame, panel,
                 "Muokkaa arvostelua", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
         //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi on oikeasti "EI" eli NO-nappi
         //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
-        if(result == JOptionPane.NO_OPTION){
+        if(result == JOptionPane.YES_OPTION){
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDateTime reviewtime = LocalDateTime.now();
             String aika = reviewtime.format(dtf);
@@ -681,10 +709,10 @@ public class SecondaryScreen {
                 JPanel noHeader = new JPanel();
                 JLabel noHeaderWarning = new JLabel("Et antanut otsikkoa");
                 noHeader.add(noHeaderWarning);
-                Object[] ok = {"Ok"};
-                JOptionPane.showOptionDialog(null, noHeader,
-                        "Virhe!", JOptionPane.YES_OPTION,
-                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+
+                JOptionPane.showMessageDialog(addwindow, noHeader,
+                        "Virhe!", JOptionPane.ERROR_MESSAGE);
+
                 addwindow.dispose();
                 return;
             }
@@ -692,10 +720,10 @@ public class SecondaryScreen {
                 JPanel noReviewtext = new JPanel();
                 JLabel noReviewTextWarning = new JLabel("Et kirjoittanut arvostelutekstiä");
                 noReviewtext.add(noReviewTextWarning);
-                Object[] ok = {"Ok"};
-                JOptionPane.showOptionDialog(null, noReviewtext,
-                        "Virhe!", JOptionPane.YES_OPTION,
-                        JOptionPane.PLAIN_MESSAGE, null, ok, null);
+
+                JOptionPane.showMessageDialog(addwindow, noReviewtext,
+                        "Virhe!", JOptionPane.ERROR_MESSAGE);
+
                 addwindow.dispose();
                 return;
             }
@@ -798,7 +826,7 @@ public class SecondaryScreen {
         displayPanel.add(Box.createVerticalGlue());
 
         Object[] sulje = {"Sulje"};
-        JOptionPane.showOptionDialog(null, displayPanel,
+        JOptionPane.showOptionDialog(displayPanel, displayPanel,
                 "KLOÄppi", JOptionPane.YES_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, sulje, null);
     }
@@ -806,33 +834,28 @@ public class SecondaryScreen {
     public void deleteReview(int i) {
         //ReviewPiece temp = arvostelut.get(i);
 
-
         JPanel deleteConfirmation = new JPanel();
         JLabel checkConsent = new JLabel("Haluatko varmasti poistaa arvostelun?");
         deleteConfirmation.add(checkConsent);
 
-        Object[] savecancelbuttons = {"Ei", "Kyllä"};
+        Object[] savecancelbuttons = {"Kyllä", "Ei"};
         int result = JOptionPane.showOptionDialog(null, deleteConfirmation,
-                "", JOptionPane.YES_NO_OPTION,
+                "Oletko varma?", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
-        //NO_OPTION on oikealla puolella ruutua, joten Tallenna-nappi
-        //on oikeasti "EI" eli NO-nappi
-        //Siksi "Tallenna"-nappi onkin ei-nappi koodin mukaan
-        if (result == JOptionPane.NO_OPTION) {
+
+        if (result == JOptionPane.YES_OPTION) {
             arvostelut.remove(i);
             JPanel deletedReviewPanel = new JPanel();
             JLabel deletedMessage = new JLabel("Arvostelu poistettiin");
             deletedReviewPanel.add(deletedMessage);
-            Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, deletedReviewPanel,
-                    "", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);
+
+            JOptionPane.showMessageDialog(deleteConfirmation, deletedReviewPanel,
+                    "", JOptionPane.PLAIN_MESSAGE);
+
             //arvostelut.add(uusi);
-            //SaveReviews();
+            SaveReviews();
             loadReviews();
             InitializeReviews();
-
-            //
         }
     }
 

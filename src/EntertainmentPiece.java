@@ -25,4 +25,8 @@ public class EntertainmentPiece implements java.io.Serializable {
     public void setCategory(String newCategory){
         category = newCategory;
     }
+
+    public String toString(){
+        return((getEntertainmentName() + getCategory()));
+    }
 }
