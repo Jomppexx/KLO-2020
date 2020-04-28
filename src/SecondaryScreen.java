@@ -11,37 +11,41 @@ import java.time.LocalDateTime;
 
 public class SecondaryScreen {
 
-    //private JFrame secondary;
+    //ArraList ladatuille arvosteluille.
     ArrayList<ReviewPiece> arvostelut = new ArrayList<>();
 
-    public String selectedTitleName;
-    public String selectedTitleCategory;
-    //private JDialog secscreen;
-    private JFrame mainScrFrame; //Frame, jotta nimikelistanäkymänä voidaan manipuloida
-    private JFrame secondaryFrame; //pääikkuna arvostelujen hallinnoimiselle
-    private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille
-    private JPanel titlesPanel; //paneeli arvostelulistalle
-    private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan
 
+    public String selectedTitleName; //Valitun nimikkeen nimi.
+    public String selectedTitleCategory; //Valitun nimikkeen kategoria.
+    private JFrame mainScrFrame; //Frame, jotta nimikelistanäkymänä voidaan manipuloida.
+    private JFrame secondaryFrame; //pääikkuna arvostelujen hallinnoimiselle.
+    private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille.
+    private JPanel titlesPanel; //paneeli arvostelulistalle.
+    private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan.
+
+    //Konstruktori luokalle SecondaryScreen. Referenssinä ovat mainScreenFrame manipulointia
+    //varten, valitun nimikkeen nimi ja valitun nimikkeen kategoria.
     public SecondaryScreen(JFrame mainScreenFrame, String title, String category){
+        //Normaali arvojen sijoitus
         mainScrFrame = mainScreenFrame;
         selectedTitleName = title;
         selectedTitleCategory = category;
+        //Lataa arvostelut ArrayListiin nimeltä arvostelut
         loadReviews();
+        //Rakentaa ikkunan
         MakeWindow();
+        //Rakentaa esimerkiksi Optionsin ja Helpin sisältävän menupalkin
         buildMenuBar();
 
     }
     private void MakeWindow() {
+        //luomme pääikkunan
         secondaryFrame = new JFrame("Arvosteluohjelma");
-        //JDialog secscreen = new JDialog(secondary, "Arvostelut");
-        //secscreen.setBackground(Color.DARK_GRAY);
-        //secondary.setBackground(Color.DARK_GRAY);
-        //secscreen.setSize(1200, 800);
-        //secscreen.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         secondaryFrame.setSize(1200,800);
         secondaryFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
+        //Jotta pääikkunaa ei voi manipuloida samalla, kun pääikkunan
+        //nimikkeen arvosteluja hallinnoidaan
         secondaryFrame.addWindowListener(new WindowAdapter()
         {
             @Override
@@ -51,14 +55,13 @@ public class SecondaryScreen {
             }
         });
 
+        //Paneeli nimikkeen tietojen näyttämiselle ja lisää/sortby/takaisin -toiminnoille.
         JPanel upperPanel = new JPanel();
         upperPanel.setBackground(Color.LIGHT_GRAY);
+        //Paneeli työkaluille.
         toolsPanel = new JPanel();
-        //GridBagLayout gbLayout = new GridBagLayout();
-        //toolsPanel.setLayout(gbLayout);
-        //GridBagConstraints gbConstraint = new GridBagConstraints();
         toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.LINE_AXIS));
-        //toolsPanel.setMaximumSize(new Dimension(200, 50));
+        //Paneeli arvosteluolioiden lataamiselle.
         titlesPanel = new JPanel();
         titlesPanel.setLayout(new BoxLayout(titlesPanel, BoxLayout.PAGE_AXIS));
         titlesPanel.setBackground(Color.LIGHT_GRAY);
@@ -69,7 +72,6 @@ public class SecondaryScreen {
          */
         // scrollPane, mahdollistaa ikkunan scrollaamisen...
         JScrollPane titlesScrollPane = new JScrollPane(titlesPanel);
-        //secscreen.add(titlesScrollPane);
         secondaryFrame.add(titlesScrollPane);
         titlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -79,8 +81,6 @@ public class SecondaryScreen {
         mainSplitPane.setOneTouchExpandable(false);
         mainSplitPane.setResizeWeight(0.5);
         mainSplitPane.setDividerSize(0);
-
-        ////toolsPanel.add(Box.createHorizontalGlue());
 
         //Title ja kategoria
         //Käytä oliota? EntertainmentPiece lotr = new EntertainmentPiece("Lord of the Rings", "Elokuvat");
@@ -92,7 +92,6 @@ public class SecondaryScreen {
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
         toolsPanel.add(Box.createHorizontalGlue());
 
-
         //Tehdään hakemistoiminto
         JLabel hakuehdot = new JLabel("Rajoita hakua:");
         String[] hakutermit={"Uusin", "Arvosana"};
@@ -101,6 +100,7 @@ public class SecondaryScreen {
         toolsPanel.add(hakuehdot);
         toolsPanel.add(sortby);
 
+        //Tehdään nappi uusien arvostelujen lisäämiselle.
         JButton newReview = new JButton("+ Uusi arvostelu");
         newReview.addActionListener(new ActionListener() {
             @Override
@@ -108,8 +108,8 @@ public class SecondaryScreen {
                 AddReview();
             }
         });
-        //toolsPanel.add(newReview);
 
+        //Tehdään nappi palaamiselle nimikelistaan.
         JButton backButton = new JButton("Palaa");
         backButton.setOpaque(false);
         backButton.setFocusPainted(false);
@@ -117,6 +117,7 @@ public class SecondaryScreen {
         backButton.setContentAreaFilled(false);
         backButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 
+        //Asetetaan layoutmanager ja säädetään komponenttien olinpaikat.
         upperPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
