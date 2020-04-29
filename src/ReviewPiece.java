@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.Comparator;
 
 //Arvostelu nimikkeelle
 public class ReviewPiece implements java.io.Serializable{
@@ -80,4 +81,24 @@ public class ReviewPiece implements java.io.Serializable{
         setNimike(title);
         setKategoria(category);
     }
+
+    public static Comparator<ReviewPiece> NewestComparator = new Comparator<ReviewPiece>(){
+        @Override
+        public int compare(ReviewPiece rp1, ReviewPiece rp2){
+            String date1 = rp1.getDate().toUpperCase();
+            String date2 = rp2.getDate().toUpperCase();
+
+            return date1.compareTo(date2);
+        }
+    };
+
+    public static Comparator<ReviewPiece> GradeComparator = new Comparator<ReviewPiece>() {
+        @Override
+        public int compare(ReviewPiece rp1, ReviewPiece rp2) {
+            int grade1 = rp1.getArvosana();
+            int grade2 = rp2.getArvosana();
+
+            return grade2-grade1;
+        }
+    };
 }

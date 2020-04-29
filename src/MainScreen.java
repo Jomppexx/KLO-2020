@@ -2,11 +2,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 // Luokka päänäkymälle
@@ -68,7 +70,7 @@ public class MainScreen extends JFrame {
         JButton newTitleButton = new JButton("Lisää nimike");
 
         //Label ja dropdown lajittelufunktiota varten
-        JLabel sortLabel = new JLabel("Sorttaa:");
+        JLabel sortLabel = new JLabel("Lajittelu:");
 
         JLabel searchPlaceholder = new JLabel("");
 
@@ -151,20 +153,25 @@ public class MainScreen extends JFrame {
     }
 
     // Avaa help dialogin, kun help nappia painetaan menussa
-    private void openHelpWindow(){
+    private void openHelpWindow() {
 
-        // Help -ikkunan sisältö tähän stringiin
-        final  String helpContent = "Tähän tulee ohjeet ohjelman käyttöön ja selitys siitä, mikä tämä ohjelma on.";
+        String content = null;
+        try {
+            content = new String(Files.readAllBytes(Paths.get("src/resources/readMe.txt")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // frame help ikkunalle
-        JFrame helpFrame = new JFrame("Apua ja infoa");
+        JFrame helpFrame = new JFrame("Käyttöohjeet");
         helpFrame.setSize(600, 440);
 
         // JOptionPane dialogi, parempi kuin pelkkä frame/pane systeemi, koska vaatii fokuksen siihen asti että ikkuna suljetaan
-        JOptionPane.showMessageDialog(mainFrame, helpContent, "Apua ja infoa", JOptionPane.PLAIN_MESSAGE);
+        JOptionPane.showMessageDialog(mainFrame, content, "Apua ja infoa", JOptionPane.PLAIN_MESSAGE);
+
     }
 
-    // Avaa options dialogin kun options nappia painetaan menussa
+        // Avaa options dialogin kun options nappia painetaan menussa
     private void openOptionsWindow(){
 
         JLabel langLabel = new JLabel("Kieli:");
