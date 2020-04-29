@@ -22,7 +22,7 @@ public class SecondaryScreen {
     private JFrame mainScrFrame; //Frame, jotta nimikelistanäkymänä voidaan manipuloida.
     private JFrame secondaryFrame; //pääikkuna arvostelujen hallinnoimiselle.
     private JPanel toolsPanel; //paneeli hakutoiminnoille ja työkalupalkille.
-    private JPanel titlesPanel; //paneeli arvostelulistalle.
+    private JPanel reviewsPanel; //paneeli arvostelulistalle.
     private JSplitPane mainSplitPane; //pääpaneeli, johon yllä olevat paneelit laitetaan.
 
     //Konstruktori luokalle SecondaryScreen. Referenssinä ovat mainScreenFrame manipulointia
@@ -64,16 +64,16 @@ public class SecondaryScreen {
         toolsPanel = new JPanel();
         toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.LINE_AXIS));
         //Paneeli arvosteluolioiden lataamiselle.
-        titlesPanel = new JPanel();
-        titlesPanel.setLayout(new BoxLayout(titlesPanel, BoxLayout.PAGE_AXIS));
-        titlesPanel.setBackground(Color.LIGHT_GRAY);
+        reviewsPanel = new JPanel();
+        reviewsPanel.setLayout(new BoxLayout(reviewsPanel, BoxLayout.PAGE_AXIS));
+        reviewsPanel.setBackground(Color.LIGHT_GRAY);
 
         /*
          * Luodaan scrollPane ja liitetään se titlesPaneeliin, jotta title paneelia voi kelata
          * kun siihen tulee "liikaa" sisältöä, eikä se kaikki näy kerralla
          */
         // scrollPane, mahdollistaa ikkunan scrollaamisen...
-        JScrollPane titlesScrollPane = new JScrollPane(titlesPanel);
+        JScrollPane titlesScrollPane = new JScrollPane(reviewsPanel);
         secondaryFrame.add(titlesScrollPane);
         titlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -266,10 +266,15 @@ public class SecondaryScreen {
         Object[] optionsButtons = {"Tallenna", "Peruuta"};
 
         //Luodaan options dialogi
-        JOptionPane.showOptionDialog(secondaryFrame, optionsPanel, "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, optionsButtons, optionsButtons[1]);
+        JOptionPane.showOptionDialog(secondaryFrame, optionsPanel,
+                "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, optionsButtons, optionsButtons[1]);
     }
 
     //AddWindow on ikkuna uusien arvostelujen lisäämiselle.
+    //Ikkunan kautta voidaan lisätä arvostelu, kunhan sille annetaan otsikko
+    //ja arvosteluteksti.
+    //Arvostelua ei ole pakko lisätä.
     private void AddReview() {
         //Paneeli, johon lisäysikkunan komponentit säilötään.
         JPanel addReviewPanel = new JPanel();
@@ -416,7 +421,7 @@ public class SecondaryScreen {
             JLabel addedConfirmation = new JLabel("Muutoksesi tallennettiin onnistuneesti");
             added.add(addedConfirmation);
 
-            JOptionPane.showMessageDialog(titlesPanel, added,
+            JOptionPane.showMessageDialog(reviewsPanel, added,
                     "Muutokset onnistuivat", JOptionPane.PLAIN_MESSAGE);
 
         } catch (IOException e){
@@ -466,12 +471,12 @@ public class SecondaryScreen {
     }
 
     //InitializeReviews-funktio renderöi arvosteluoliot pääikkunaan arvostelut-ArrayListin
-    //avulla.
+    //avulla. Arvosteluoliot ladataan reviewsPanel-Jpanelin näkymään tietojen kanssa.
     public void InitializeReviews() {
         //Poistamme kaikki "vanhat" eli aikaisemmat arvosteluoliot nätöltä,
         //ettemme saa duplikaattiolioita näkyviin.
-        titlesPanel.removeAll();
-        titlesPanel.add(Box.createRigidArea(new Dimension(7,7)));
+        reviewsPanel.removeAll();
+        reviewsPanel.add(Box.createRigidArea(new Dimension(7,7)));
         for(int i=0;i<arvostelut.size();i++) {
             //Oliota temp käytetään manipulointiin.
             ReviewPiece temp = arvostelut.get(i);
@@ -506,34 +511,36 @@ public class SecondaryScreen {
                 });
 
                 //Luodaan itse näkyvä olio.
-                JPanel testi = new JPanel();
-                testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
-                testi.setBackground(Color.WHITE);
-                testi.add(Box.createRigidArea(new Dimension(5,0)));
-            testi.add(grade);
-            testi.add(Box.createRigidArea(new Dimension(5, 0)));
-            testi.add(header);
-            testi.add(Box.createHorizontalGlue());
-            testi.add(date);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
-            testi.add(open);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
-            testi.add(edit);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
+                JPanel reviewObjectPanel = new JPanel();
+                reviewObjectPanel.setLayout(new BoxLayout(reviewObjectPanel,
+                        BoxLayout.LINE_AXIS));
+                reviewObjectPanel.setBackground(Color.WHITE);
+                reviewObjectPanel.add(Box.createRigidArea(new Dimension(5,0)));
+                reviewObjectPanel.add(grade);
+                reviewObjectPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+                reviewObjectPanel.add(header);
+                reviewObjectPanel.add(Box.createHorizontalGlue());
+                reviewObjectPanel.add(date);
+                reviewObjectPanel.add(Box.createRigidArea(new Dimension(5,0)));
+                reviewObjectPanel.add(open);
+                reviewObjectPanel.add(Box.createRigidArea(new Dimension(5,0)));
+                reviewObjectPanel.add(edit);
+                reviewObjectPanel.add(Box.createRigidArea(new Dimension(5,0)));
 
-                titlesPanel.add(testi);
-                testi.setVisible(true);
-                titlesPanel.add(Box.createRigidArea(new Dimension(7,7)));
+                reviewsPanel.add(reviewObjectPanel);
+                reviewObjectPanel.setVisible(true);
+                reviewsPanel.add(Box.createRigidArea(new Dimension(7,7)));
             }
 
             //Koska muutimme käyttöliittymää koodin suorituksen aikana, joudumme
             //suorittamaan seuraavat komennot.
-            titlesPanel.revalidate();
-            titlesPanel.repaint();
+            reviewsPanel.revalidate();
+            reviewsPanel.repaint();
         }
     }
 
     //editReview-funktio suorittaa arvostelun muokkauksen.
+    //Ikkunassa voidaan muuttaa arvostelun tietoja tai jopa poistaa arvostelu.
     public void editReview(int i) {
         //Väliaikinen olio manipulointia varten.
         ReviewPiece temp = arvostelut.get(i);
@@ -682,6 +689,8 @@ public class SecondaryScreen {
 
     }
 
+    //openReview avaa arvostelun ja näyttää arvostelun tiedot.
+    //Ikkunassa voi vain sulkea arvosteluikkunan.
     public void openReview(int i) {
         JPanel displayPanel = new JPanel();
         displayPanel.setMaximumSize(new Dimension(600,300));
@@ -735,7 +744,7 @@ public class SecondaryScreen {
                 JOptionPane.PLAIN_MESSAGE, null, sulje, null);
     }
 
-    //deltedReview-funktio poistaa arvostelun.
+    //deleteReview-funktio poistaa arvostelun arvostelut-ArrayListin indeksissä i.
     public void deleteReview(int i) {
 
         //Tehdään varoitustekstit

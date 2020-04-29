@@ -618,6 +618,7 @@ public class MainScreen extends JFrame {
         //ArrayList temp on manipulointia varten.
         ArrayList<ReviewPiece> temp = new ArrayList<>();
 
+        //Tarkistetaan tiedoston olemassaolo
         if(!fileToCheck.isFile()) {
             File objSer = new File("object.ser");
             try {
@@ -626,6 +627,7 @@ public class MainScreen extends JFrame {
                 e.printStackTrace();
             }
         } else {
+            //Yritetään ladata arvostelut tiedostosta
             try {
                 FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
                         File.separator + "object.ser");
@@ -636,11 +638,11 @@ public class MainScreen extends JFrame {
                 } catch (ClassNotFoundException c) {
                     c.printStackTrace();
                 }
-                //this.arvostelut = temp;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        //Alustetaan arvostelut
         arvostelut = temp;
 
         //Haemme oikeat arvostelut ja laitamme ne uuteen ArrayListiin
@@ -651,7 +653,6 @@ public class MainScreen extends JFrame {
             if (manipulation.getNimike().equals(title) &&
                     manipulation.getKategoria().equals(category)) {
                 titleReviews.add(temp.get(i));
-                //temp.remove(i);
             }
         }
 
