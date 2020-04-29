@@ -1,9 +1,11 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
@@ -83,7 +85,6 @@ public class SecondaryScreen {
         mainSplitPane.setDividerSize(0);
 
         //Title ja kategoria
-        //Käytä oliota? EntertainmentPiece lotr = new EntertainmentPiece("Lord of the Rings", "Elokuvat");
         JLabel title = new JLabel (selectedTitleName);
         toolsPanel.add(title, BorderLayout.LINE_START);
         toolsPanel.add(Box.createRigidArea(new Dimension(5,5)));
@@ -111,53 +112,66 @@ public class SecondaryScreen {
 
         //Tehdään nappi palaamiselle nimikelistaan.
         JButton backButton = new JButton("Palaa");
+
+        backButton.addActionListener(event -> {
+            mainScrFrame.setVisible(true);
+            secondaryFrame.dispose();
+        });
+
         backButton.setOpaque(false);
         backButton.setFocusPainted(false);
         backButton.setBorderPainted(false);
         backButton.setContentAreaFilled(false);
         backButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 
+        //Ladataan nappiin kuvake
+        //Kuvan tulee olla samassa hakemistossa lähdekoodin kanssa
+        try{
+            Image img = ImageIO.read(getClass().getResource("resources/back-button.png"));
+            backButton.setIcon(new ImageIcon(img));
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+
         //Asetetaan layoutmanager ja säädetään komponenttien olinpaikat.
         upperPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        c.fill = GridBagConstraints.HORIZONTAL;
+        //x = 0, y = 0
+        c.anchor = GridBagConstraints.LINE_START;
+        c.gridheight = 2;
+        c.gridwidth = 2;
+        c.weightx = 0.1;
+        c.insets = new Insets(0,20,0,0);
+        upperPanel.add(backButton, c);
+
+        c.anchor = GridBagConstraints.CENTER;
+        c.weightx = 0.1;
+        c.insets = new Insets(0,0,0,0);
+        c.gridheight = 1;
+        c.gridwidth = 1;
         c.gridx = 1;
         c.gridy = 0;
-        c.weightx = 0.5;
-        c.ipady = 10;
         upperPanel.add(title, c);
 
-        c.gridx = 1;
         c.gridy = 1;
         upperPanel.add(kategoria, c);
+        c.insets = new Insets(0,0,0,0);
 
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0.2;
         c.gridx = 3;
-        c.gridy = 1;
-        c.gridheight = 1;
-        c.gridwidth = 1;
-        c.ipady = 40;
-        c.ipadx = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        c.fill = GridBagConstraints.BOTH;
-        upperPanel.add(newReview);
-
-
-        c.anchor = GridBagConstraints.PAGE_END;
-        c.fill = GridBagConstraints.VERTICAL;
-        c.gridwidth = 1;
-        c.gridheight = 1;
-        c.weightx = 0.5;
-        c.weighty = 0;
-        c.ipady = 0;
-        c.ipadx = 0;
-        c.gridx = 5;
         c.gridy = 0;
+        c.gridheight = 2;
+        upperPanel.add(newReview, c);
+
+        c.insets = new Insets(0,0,0,15);
+        c.weightx = 0.1;
+        c.gridx = 4;
+        c.gridheight = 1;
         JLabel sorttext = new JLabel("Hakuehdot:");
         upperPanel.add(sorttext, c);
 
-        c.gridx = 5;
         c.gridy = 1;
         upperPanel.add(sortby, c);
 
@@ -165,7 +179,7 @@ public class SecondaryScreen {
         secondaryFrame.add(mainSplitPane);
         secondaryFrame.setLocationRelativeTo(null);
         secondaryFrame.setVisible(true);
-        mainSplitPane.setDividerLocation(0.07);
+        mainSplitPane.setDividerLocation(0.1);
         secondaryFrame.setResizable(false);
         //Renderöidään tallennetut arvostelut.
         InitializeReviews();
@@ -495,16 +509,17 @@ public class SecondaryScreen {
                 JPanel testi = new JPanel();
                 testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
                 testi.setBackground(Color.WHITE);
-                testi.add(grade);
-                testi.add(Box.createRigidArea(new Dimension(5, 0)));
-                testi.add(header);
-                testi.add(Box.createHorizontalGlue());
-                testi.add(date);
                 testi.add(Box.createRigidArea(new Dimension(5,0)));
-                testi.add(open);
-                testi.add(Box.createRigidArea(new Dimension(5,0)));
-                testi.add(edit);
-                testi.add(Box.createRigidArea(new Dimension(5,0)));
+            testi.add(grade);
+            testi.add(Box.createRigidArea(new Dimension(5, 0)));
+            testi.add(header);
+            testi.add(Box.createHorizontalGlue());
+            testi.add(date);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
+            testi.add(open);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
+            testi.add(edit);
+            testi.add(Box.createRigidArea(new Dimension(5,0)));
 
                 titlesPanel.add(testi);
                 testi.setVisible(true);

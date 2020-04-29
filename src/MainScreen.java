@@ -37,7 +37,7 @@ public class MainScreen extends JFrame {
 
         // Lopuksi freimi näkyviin ja ikkuna aukeaa
         mainFrame.setVisible(true);
-        mainSplitPane.setDividerLocation(0.07);
+        mainSplitPane.setDividerLocation(0.08);
     }
 
     // Rakentaa framen ja sen sisällä olevat paneelit
@@ -47,10 +47,10 @@ public class MainScreen extends JFrame {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         toolsPanel = new JPanel();
-        //GridBagLayout gbLayout = new GridBagLayout();
-        //toolsPanel.setLayout(gbLayout);
-        //GridBagConstraints gbConstraint = new GridBagConstraints();
-        toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.LINE_AXIS));
+        //toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.LINE_AXIS));
+        toolsPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
         titlesPanel = new JPanel();
         titlesPanel.setLayout(new BoxLayout(titlesPanel, BoxLayout.PAGE_AXIS));
 
@@ -62,16 +62,15 @@ public class MainScreen extends JFrame {
         JScrollPane titlesScrollPane = new JScrollPane(titlesPanel);
         mainFrame.add(titlesScrollPane);
         titlesScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        titlesScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         // Nappi uusien nimikkeiden (elokuvat, kirjat, ym.) lisäämistä varten
         JButton newTitleButton = new JButton("Lisää nimike");
 
-        toolsPanel.add(Box.createRigidArea(new Dimension(15,0)));
-        toolsPanel.add(newTitleButton, BorderLayout.LINE_START);
-        newTitleButton.addActionListener((event) -> addNewTitle());
-
+        //Label ja dropdown lajittelufunktiota varten
         JLabel sortLabel = new JLabel("Sorttaa:");
-        JLabel searchPlaceholder = new JLabel("Hakupalkin placeholder");
+
+        JLabel searchPlaceholder = new JLabel("");
 
         String[] sortingOptions = {"Aakkosjärjestys", "Kategorioittain"};
         JComboBox<String> sortingDrop = new JComboBox<>(sortingOptions);
@@ -81,12 +80,29 @@ public class MainScreen extends JFrame {
             sortEPBoxes(sortingDrop.getSelectedItem());
         });
 
-        toolsPanel.add(Box.createHorizontalGlue());
-        toolsPanel.add(searchPlaceholder);
-        toolsPanel.add(Box.createRigidArea(new Dimension(15,0)));
-        toolsPanel.add(sortLabel);
-        toolsPanel.add(Box.createRigidArea(new Dimension(15,0)));
-        toolsPanel.add(sortingDrop);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.1;
+        gbc.gridheight = 2;
+        gbc.gridwidth = 2;
+        toolsPanel.add(newTitleButton, gbc);
+        newTitleButton.addActionListener((event) -> addNewTitle());
+
+        gbc.gridx = 2;
+        gbc.gridy= 0;
+        gbc.weightx = 0.6;
+        toolsPanel.add(searchPlaceholder, gbc);
+
+        gbc.gridx = 4;
+        gbc.weightx = 0.2;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.insets = new Insets(0,0,0,-150);
+        toolsPanel.add(sortLabel, gbc);
+
+        gbc.insets = new Insets(0,-50,0,0);
+        gbc.gridx = 5;
+        toolsPanel.add(sortingDrop, gbc);
 
         // "Pääpaneeli" on splitpane, jossa yläosaan tulee hakutyökalujen paneeli ja alaosaan eri nimikkeet
         mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, toolsPanel, titlesScrollPane);
@@ -249,6 +265,8 @@ public class MainScreen extends JFrame {
         JLabel epName = new JLabel();
         JLabel epCateg = new JLabel();
         JButton openButton = new JButton("Avaa");
+        epPanel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 
         //Avaa -napin action listener. Avaa kysyisen nimikkeen tiedoilla arvostelulistanäkymän
         openButton.addActionListener(event -> {
@@ -261,27 +279,46 @@ public class MainScreen extends JFrame {
         JButton editButton = new JButton("Muokkaa");
         editButton.addActionListener(event -> editButtonPushed(ep, epName, epCateg));
 
-        //BoxLayout toistaiseksi, muutetaan jos deadlineen jää aikaa
-        epPanel.setLayout(new BoxLayout(epPanel, BoxLayout.LINE_AXIS));
-        //epPanel.setLayout(new GridBagLayout());
-        //GridBagConstraints gbc = new GridBagConstraints();
-
         String fullCategory = ("Kategoria: " + ep.getCategory());
         epName.setText(ep.getEntertainmentName());
         epCateg.setText(fullCategory);
 
-        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
-        epPanel.add(epName);
-        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
-        epPanel.add(epCateg);
-        epPanel.add(Box.createHorizontalGlue());
-        epPanel.add(openButton);
-        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
-        epPanel.add(editButton);
-        epPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets = new Insets(0,30,0,0);
+        gbc.ipady = 10;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.8;
+        gbc.weighty = 0.8;
+        epName.setMaximumSize(new Dimension(200,10));
+        epName.setMinimumSize(new Dimension(60,10));
+        epName.setPreferredSize(new Dimension(150,10));
+        epPanel.add(epName, gbc);
 
-        //revalidate & repaint, jotta paneeli päivittyy runtime
-        titlesPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0,30,0,0);
+        epCateg.setMaximumSize(new Dimension(200,10));
+        epCateg.setMinimumSize(new Dimension(60,10));
+        epCateg.setPreferredSize(new Dimension(150,10));
+        epPanel.add(epCateg, gbc);
+
+        gbc.insets = new Insets(0,0,0,-60);
+        gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.weightx = 0.1;
+        gbc.weighty = 0.1;
+        gbc.gridheight = 2;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        epPanel.add(openButton, gbc);
+
+        gbc.insets = new Insets(0,0,0,100);
+        gbc.gridx = 2;
+        epPanel.add(editButton, gbc);
+
+        //revalidate & repaint, jotta paneeli päivittyy
+        titlesPanel.add(Box.createRigidArea(new Dimension(0,10)));
+        epPanel.setMinimumSize(new Dimension(1150,50));
+        epPanel.setMaximumSize(new Dimension(1150,60));
+        epPanel.setPreferredSize(new Dimension(1150,60));
         titlesPanel.add(epPanel);
         titlesPanel.revalidate();
         titlesPanel.repaint();
@@ -577,7 +614,7 @@ public class MainScreen extends JFrame {
         String fullFile = File.separator + "object.ser";
         File fileToCheck = new File(userDirFile, fullFile);
         //ArrayList arvostelut on lopullista tallennusta varten.
-        ArrayList<ReviewPiece> arvostelut = new ArrayList();
+        ArrayList<ReviewPiece> arvostelut = new ArrayList<>();
         //ArrayList temp on manipulointia varten.
         ArrayList<ReviewPiece> temp = new ArrayList<>();
 
