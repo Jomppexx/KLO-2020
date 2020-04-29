@@ -257,18 +257,15 @@ public class SecondaryScreen {
 
     //AddWindow on ikkuna uusien arvostelujen lisäämiselle.
     private void AddReview() {
-        //Ikkuna, jossa
-        //JFrame addwindow = new JFrame("Uusi Arvostelu");
-        //addwindow.setSize(400,600);
         //Paneeli, johon lisäysikkunan komponentit säilötään.
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.LIGHT_GRAY);
-        panel.setSize(400, 600);
-        panel.setMaximumSize(new Dimension(400,600));
-        panel.setPreferredSize(new Dimension(400,600));
+        JPanel addReviewPanel = new JPanel();
+        addReviewPanel.setBackground(Color.LIGHT_GRAY);
+        addReviewPanel.setSize(400, 600);
+        addReviewPanel.setMaximumSize(new Dimension(400,600));
+        addReviewPanel.setPreferredSize(new Dimension(400,600));
         //Asetetaan BoxLayout elementtien laittamiseen Y-akselille.
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        addReviewPanel.setLayout(new BoxLayout(addReviewPanel, BoxLayout.Y_AXIS));
+        addReviewPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         //Lisätään nimikkeen nimi
         JLabel title = new JLabel(selectedTitleName);
@@ -278,7 +275,7 @@ public class SecondaryScreen {
         titlePanel.add(titleIs);
         titlePanel.add(title);
         titlePanel.setBackground(Color.LIGHT_GRAY);
-        panel.add(titlePanel);
+        addReviewPanel.add(titlePanel);
 
         //Lisätään nimikkeen kategoria
         JLabel category = new JLabel(selectedTitleCategory);
@@ -288,19 +285,19 @@ public class SecondaryScreen {
         categoryPanel.add(categoryIs);
         categoryPanel.add(category);
         categoryPanel.setBackground(Color.LIGHT_GRAY);
-        panel.add(categoryPanel);
+        addReviewPanel.add(categoryPanel);
 
         //Lisätään otsikon tekstikenttä
         JTextField headerfield = new JTextField(1);
         headerfield.setMaximumSize(new Dimension(150,15));
-        headerfield.setAlignmentX(panel.CENTER_ALIGNMENT);
+        headerfield.setAlignmentX(addReviewPanel.CENTER_ALIGNMENT);
         JLabel headerIs = new JLabel("Otsikko: ");
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.LINE_AXIS));
         headerPanel.add(headerIs);
         headerPanel.add(headerfield);
         headerPanel.setBackground(Color.LIGHT_GRAY);
-        panel.add(headerPanel);
+        addReviewPanel.add(headerPanel);
 
         //Lisätään arvosteludropdown
         String[] grades={"1","2","3","4","5","6","7","8","9","10"};
@@ -312,13 +309,13 @@ public class SecondaryScreen {
         gradePanel.add(gradeIs);
         gradePanel.add(grade);
         gradePanel.setBackground(Color.LIGHT_GRAY);
-        panel.add(gradePanel);
+        addReviewPanel.add(gradePanel);
 
         //Lisätään tekstikenttä arvostelun kirjoittamiselle.
         JTextArea reviewtext = new JTextArea(20,50);
         //reviewtext.setMaximumSize(new Dimension(350, 500)); //500 500
         //reviewtext.setPreferredSize(new Dimension(350,500));
-        reviewtext.setAlignmentX(panel.CENTER_ALIGNMENT);
+        reviewtext.setAlignmentX(addReviewPanel.CENTER_ALIGNMENT);
         reviewtext.setWrapStyleWord(true);
         reviewtext.setLineWrap(true);
 
@@ -326,17 +323,17 @@ public class SecondaryScreen {
         //ja kaikki teksti ei näy samalla kertaa
         JScrollPane rullatirullaa = new JScrollPane(reviewtext);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        panel.add(rullatirullaa);
+        addReviewPanel.add(rullatirullaa);
 
         //Lisätään "+Media" -nappi
         JButton plusmedia = new JButton("+Media");
-        plusmedia.setAlignmentX(panel.CENTER_ALIGNMENT);
+        plusmedia.setAlignmentX(addReviewPanel.CENTER_ALIGNMENT);
 
-        panel.add(plusmedia);
+        addReviewPanel.add(plusmedia);
 
         //Lisätään tallennusmekaniikka
         Object[] savecancelbuttons = {"Tallenna", "Peruuta"};
-        int result = JOptionPane.showOptionDialog(secondaryFrame, panel,
+        int result = JOptionPane.showOptionDialog(secondaryFrame, addReviewPanel,
                 "Uusi arvostelu", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
         //YES vastaa Tallenna-nappia!
@@ -377,22 +374,6 @@ public class SecondaryScreen {
                     reviewtext.getText(),
                     aika);
 
-            JPanel added = new JPanel();
-            added.setSize(400,800);
-            JLabel otsikko = new JLabel("Arvostelusi lisättiin onnistuneesti");
-            //new JLabel(headerfield.getText());
-            int a = uusi.getArvosana();
-            String arvo = Integer.toString(a);
-            JLabel arvosana = new JLabel(arvo);
-            JLabel testi = new JLabel("hei");
-
-            added.add(otsikko);
-            //added.add(arvosana);
-            //addwindow.add(added);
-            /*Object[] ok = {"Ok"};
-            JOptionPane.showOptionDialog(null, added,
-                    "", JOptionPane.YES_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, ok, null);*/
             //Lisätään uusi arvostelu ArrayListiin
             arvostelut.add(uusi);
             //Tallennetaan arvostelut kansioon
@@ -548,17 +529,17 @@ public class SecondaryScreen {
         //addwindow.setSize(400,600);
         //addwindow.setBackground(Color.LIGHT_GRAY);
         //Tehdään JPanel muokattavan arvostelun tietojen esittämiseksi
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.WHITE);
-        panel.setSize(400, 600);
-        panel.setMaximumSize(new Dimension(400,600));
-        panel.setPreferredSize(new Dimension(400,600));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel editReviewPanel = new JPanel();
+        editReviewPanel.setBackground(Color.WHITE);
+        editReviewPanel.setSize(400, 600);
+        editReviewPanel.setMaximumSize(new Dimension(400,600));
+        editReviewPanel.setPreferredSize(new Dimension(400,600));
+        editReviewPanel.setLayout(new BoxLayout(editReviewPanel, BoxLayout.Y_AXIS));
+        editReviewPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         //Alustetaan nimikkeen nimi ja laitetaan se JPaneeliin
         JLabel title = new JLabel(selectedTitleName);
-        title.setAlignmentX(panel.CENTER_ALIGNMENT);
+        title.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
         JLabel nimike = new JLabel("Nimike: ");
         JPanel nimikealue = new JPanel();
         nimikealue.setLayout(new BoxLayout(nimikealue, BoxLayout.LINE_AXIS));
@@ -568,7 +549,7 @@ public class SecondaryScreen {
 
         //Alustetaan kategoriatiedot ja laitetaan ne JPaneeliin
         JLabel category = new JLabel(selectedTitleCategory);
-        category.setAlignmentX(panel.CENTER_ALIGNMENT);
+        category.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
         JLabel kategoria = new JLabel("Kategoria: ");
         JPanel kategoriaalue = new JPanel();
         kategoriaalue.setLayout(new BoxLayout(kategoriaalue, BoxLayout.LINE_AXIS));
@@ -579,7 +560,7 @@ public class SecondaryScreen {
         //Alustetaan otsikon tiedot
         JTextField headerfield = new JTextField(temp.getOtsikko(), 1);
         headerfield.setMaximumSize(new Dimension(150,15));
-        headerfield.setAlignmentX(panel.CENTER_ALIGNMENT);
+        headerfield.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
 
         //Alustetaan arvosana ja arvosanat sisältävä dropdown
         int arvotemp = temp.getArvosana();
@@ -594,7 +575,7 @@ public class SecondaryScreen {
                 20,50);
         reviewtext.setWrapStyleWord(true);
         reviewtext.setLineWrap(true);
-        reviewtext.setAlignmentX(panel.CENTER_ALIGNMENT);
+        reviewtext.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
 
         //Lisätään arvostelutekstiin scrollbar tarvittaessa
         JScrollPane rullatirullaa = new JScrollPane(reviewtext);
@@ -602,11 +583,11 @@ public class SecondaryScreen {
 
         //Alustetaan "+Media" -nappi
         JButton plusmedia = new JButton("+Media");
-        plusmedia.setAlignmentX(panel.CENTER_ALIGNMENT);
+        plusmedia.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
 
         //Alustetaan poistonappi ja lisätään sille kuuntelija
         JButton delete = new JButton("Poista arvostelu");
-        delete.setAlignmentX(panel.CENTER_ALIGNMENT);
+        delete.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -617,10 +598,10 @@ public class SecondaryScreen {
         });
 
         //Lisätään komponentit
-        panel.add(nimikealue);
-        panel.add(kategoriaalue);
-        panel.add(headerfield);
-        panel.add(grade);
+        editReviewPanel.add(nimikealue);
+        editReviewPanel.add(kategoriaalue);
+        editReviewPanel.add(headerfield);
+        editReviewPanel.add(grade);
 
         //Lisätään tekstikenttä ja scrollbar erilliseen JPaneliin, jotta
         //ne ovat vierekkäin
@@ -628,16 +609,16 @@ public class SecondaryScreen {
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
         textArea.add(rullatirullaa);
         textArea.setBackground(Color.LIGHT_GRAY);
-        panel.add(textArea);
+        editReviewPanel.add(textArea);
 
-        panel.add(plusmedia);
-        panel.add(delete);
+        editReviewPanel.add(plusmedia);
+        editReviewPanel.add(delete);
 
         //addwindow.getContentPane().add(panel);
         //addwindow.add(panel);
 
         Object[] savecancelbuttons = {"Tallenna", "Peruuta"};
-        int result = JOptionPane.showOptionDialog(secondaryFrame, panel,
+        int result = JOptionPane.showOptionDialog(secondaryFrame, editReviewPanel,
                 "Muokkaa arvostelua", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
         //YES-nappi vastaa Tallenna-nappia!
@@ -674,17 +655,6 @@ public class SecondaryScreen {
             arvostelut.get(i).setDate(aika);
             arvostelut.get(i).setArvosteluteksti(reviewtext.getText());
 
-            /*JPanel added = new JPanel();
-            added.setSize(400,800);
-            JLabel otsikko = new JLabel(headerfield.getText());
-            int a = arvostelut.get(i).getArvosana();
-            String arvo = Integer.toString(a);
-            JLabel arvosana = new JLabel(arvo);
-            JLabel testi = new JLabel("hei");
-
-
-            added.add(otsikko);
-            added.add(arvosana);*/
             //Tallennetaan arvostelut
             SaveReviews();
             //Ladataan arvostelut
@@ -704,9 +674,8 @@ public class SecondaryScreen {
         displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.PAGE_AXIS));
         displayPanel.setBackground(Color.LIGHT_GRAY);
 
+        //Alustetaan arvostelun otsikko ja arvosana
         JPanel headerAndGrade = new JPanel();
-        //parentikkunan leveys
-        //ota koko leveys saatavilla
         headerAndGrade.setMaximumSize(new Dimension(1000,50));
         headerAndGrade.setPreferredSize(new Dimension(1000,50));
         headerAndGrade.setLayout(new BoxLayout(headerAndGrade, BoxLayout.LINE_AXIS));
@@ -722,9 +691,9 @@ public class SecondaryScreen {
 
         displayPanel.add(headerAndGrade);
 
-        JPanel test = new JPanel();
-        test.setLayout(new BoxLayout(test, BoxLayout.PAGE_AXIS));
-        //Multiline, GridLayout
+        //Alustetaan arvostelutekstialue ja laitetaan sille tarvittaessa scrollbar
+        JPanel reviewTextArea = new JPanel();
+        reviewTextArea.setLayout(new BoxLayout(reviewTextArea, BoxLayout.PAGE_AXIS));
         JTextArea reviewTextGoesHere = new JTextArea(temp.getArvosteluteksti(), 5,
                 60);
         reviewTextGoesHere.setWrapStyleWord(true);
@@ -732,45 +701,54 @@ public class SecondaryScreen {
         reviewTextGoesHere.setEditable(false);
         JScrollPane rullatirullaa = new JScrollPane(reviewTextGoesHere);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        test.add(Box.createVerticalGlue());
+        reviewTextArea.add(Box.createVerticalGlue());
 
+        //Lisätään arvosteluteksti textArea-JPanelin kautta
         JPanel textArea = new JPanel();
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
         textArea.add(rullatirullaa);
         textArea.setBackground(Color.LIGHT_GRAY);
 
-        test.add(textArea);
-        displayPanel.add(test);
+        reviewTextArea.add(textArea);
+        displayPanel.add(reviewTextArea);
         displayPanel.add(Box.createVerticalGlue());
 
+        //Tehdään itse ikkuna
         Object[] sulje = {"Sulje"};
         JOptionPane.showOptionDialog(displayPanel, displayPanel,
                 "KLOÄppi", JOptionPane.YES_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, sulje, null);
     }
 
+    //deltedReview-funktio poistaa arvostelun.
     public void deleteReview(int i) {
 
+        //Tehdään varoitustekstit
         JPanel deleteConfirmation = new JPanel();
         JLabel checkConsent = new JLabel("Haluatko varmasti poistaa arvostelun?");
         deleteConfirmation.add(checkConsent);
 
+        //Tehdään varoitusikkuna
         Object[] savecancelbuttons = {"Kyllä", "Ei"};
         int result = JOptionPane.showOptionDialog(null, deleteConfirmation,
                 "Oletko varma?", JOptionPane.YES_NO_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, savecancelbuttons, null);
 
+        //Poistetaan arvostelu
         if (result == JOptionPane.YES_OPTION) {
             arvostelut.remove(i);
             JPanel deletedReviewPanel = new JPanel();
             JLabel deletedMessage = new JLabel("Arvostelu poistettiin");
             deletedReviewPanel.add(deletedMessage);
 
+            //Tallennetaan muutokset
+            SaveReviews();
+            //Vahvistusviesti poistolle
             JOptionPane.showMessageDialog(deleteConfirmation, deletedReviewPanel,
                     "", JOptionPane.PLAIN_MESSAGE);
-
-            SaveReviews();
+            //Ladataan arvostelut
             loadReviews();
+            //Renderöidään arvostelut
             InitializeReviews();
         }
     }
