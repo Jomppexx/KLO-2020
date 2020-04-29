@@ -8,6 +8,12 @@ public class ReviewPiece implements java.io.Serializable{
     private int arvosana;
     private String arvosteluteksti;
     public String date;
+    //exTitle on vanhan nimikkeen nimi, jos nimiketietoja muutetaan. Käytetään
+    //tietojen muuttamiseen MainScreenin changeassociatedeReviews-funktiossa.
+    public String exTitle;
+    //exCategory on vanhan nimikkeen kategoria, jos nimiketietoja muutetaan. Käytetään
+    //tietojen muuttamiseen MainScreenin changeassociatedeReviews-funktiossa.
+    public String exCategory;
 
     public ReviewPiece(String title, String category,
                        String header, int grade, String reviewtext,
@@ -55,5 +61,23 @@ public class ReviewPiece implements java.io.Serializable{
     }
     public void setArvosteluteksti(String reviewtext){
         arvosteluteksti = reviewtext;
+    }
+    public void setExTitle(String vanhanimike) {
+        exTitle = vanhanimike;
+    }
+    public String getExTitle() {
+        return exTitle;
+    }
+    public void setExCategory(String vanhakategoria) {
+        exCategory = vanhakategoria;
+    }
+    public String getExCategory() {
+        return exCategory;
+    }
+    public void changeTitleInfo(String title, String category) {
+        exTitle = getNimike();
+        exCategory = getKategoria();
+        setNimike(title);
+        setKategoria(category);
     }
 }

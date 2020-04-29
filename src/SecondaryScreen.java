@@ -481,53 +481,53 @@ public class SecondaryScreen {
             //Oliota temp käytetään manipulointiin.
             ReviewPiece temp = arvostelut.get(i);
             if (temp.getNimike().equals(selectedTitleName) &&
-            temp.getKategoria().equals(selectedTitleCategory)) {
+                temp.getKategoria().equals(selectedTitleCategory)) {
 
-            //Haetaan tarvitut arvostelun tiedot.
-            int arvo = arvostelut.get(i).getArvosana();
-            String arvosana = Integer.toString(arvo);
-            String otsikko = arvostelut.get(i).getOtsikko();
-            String aika = arvostelut.get(i).getDate();
+                //Haetaan tarvitut arvostelun tiedot.
+                int arvo = arvostelut.get(i).getArvosana();
+                String arvosana = Integer.toString(arvo);
+                String otsikko = arvostelut.get(i).getOtsikko();
+                String aika = arvostelut.get(i).getDate();
 
-            JLabel header = new JLabel(otsikko);
-            JLabel grade = new JLabel(arvosana);
-            JLabel date = new JLabel(aika);
-            JButton open = new JButton("Avaa");
-            int test = i;
-            //Lisätään avausnapille kuuntelija.
-            open.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                JLabel header = new JLabel(otsikko);
+                JLabel grade = new JLabel(arvosana);
+                JLabel date = new JLabel(aika);
+                JButton open = new JButton("Avaa");
+                int test = i;
+                //Lisätään avausnapille kuuntelija.
+                open.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
                     openReview(test);
                 }
-            });
-            JButton edit = new JButton("Muokkaa");
-            //Lisätään muokkausnapille kuuntelija.
-            edit.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                });
+                JButton edit = new JButton("Muokkaa");
+                //Lisätään muokkausnapille kuuntelija.
+                edit.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
                     editReview(test);
                 }
-            });
+                });
 
-            //Luodaan itse näkyvä olio.
-            JPanel testi = new JPanel();
-            testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
-            testi.setBackground(Color.WHITE);
-            testi.add(grade);
-            testi.add(Box.createRigidArea(new Dimension(5, 0)));
-            testi.add(header);
-            testi.add(Box.createHorizontalGlue());
-            testi.add(date);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
-            testi.add(open);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
-            testi.add(edit);
-            testi.add(Box.createRigidArea(new Dimension(5,0)));
+                //Luodaan itse näkyvä olio.
+                JPanel testi = new JPanel();
+                testi.setLayout(new BoxLayout(testi, BoxLayout.LINE_AXIS));
+                testi.setBackground(Color.WHITE);
+                testi.add(grade);
+                testi.add(Box.createRigidArea(new Dimension(5, 0)));
+                testi.add(header);
+                testi.add(Box.createHorizontalGlue());
+                testi.add(date);
+                testi.add(Box.createRigidArea(new Dimension(5,0)));
+                testi.add(open);
+                testi.add(Box.createRigidArea(new Dimension(5,0)));
+                testi.add(edit);
+                testi.add(Box.createRigidArea(new Dimension(5,0)));
 
-            titlesPanel.add(testi);
-            testi.setVisible(true);
-            titlesPanel.add(Box.createRigidArea(new Dimension(7,7)));
+                titlesPanel.add(testi);
+                testi.setVisible(true);
+                titlesPanel.add(Box.createRigidArea(new Dimension(7,7)));
             }
 
             //Koska muutimme käyttöliittymää koodin suorituksen aikana, joudumme
@@ -544,9 +544,10 @@ public class SecondaryScreen {
         //
         //POISTA ADDWINDOW
         //
-        JFrame addwindow = new JFrame("Muokkaa arvostelua");
-        addwindow.setSize(400,600);
-        addwindow.setBackground(Color.LIGHT_GRAY);
+        //JFrame addwindow = new JFrame("Muokkaa arvostelua");
+        //addwindow.setSize(400,600);
+        //addwindow.setBackground(Color.LIGHT_GRAY);
+        //Tehdään JPanel muokattavan arvostelun tietojen esittämiseksi
         JPanel panel = new JPanel();
         panel.setBackground(Color.WHITE);
         panel.setSize(400, 600);
@@ -555,8 +556,9 @@ public class SecondaryScreen {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //Alustetaan nimikkeen nimi ja laitetaan se JPaneeliin
         JLabel title = new JLabel(selectedTitleName);
-        title.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        title.setAlignmentX(panel.CENTER_ALIGNMENT);
         JLabel nimike = new JLabel("Nimike: ");
         JPanel nimikealue = new JPanel();
         nimikealue.setLayout(new BoxLayout(nimikealue, BoxLayout.LINE_AXIS));
@@ -564,8 +566,9 @@ public class SecondaryScreen {
         nimikealue.add(title);
         nimikealue.setBackground(Color.LIGHT_GRAY);
 
+        //Alustetaan kategoriatiedot ja laitetaan ne JPaneeliin
         JLabel category = new JLabel(selectedTitleCategory);
-        category.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        category.setAlignmentX(panel.CENTER_ALIGNMENT);
         JLabel kategoria = new JLabel("Kategoria: ");
         JPanel kategoriaalue = new JPanel();
         kategoriaalue.setLayout(new BoxLayout(kategoriaalue, BoxLayout.LINE_AXIS));
@@ -573,31 +576,37 @@ public class SecondaryScreen {
         kategoriaalue.add(category);
         kategoriaalue.setBackground(Color.LIGHT_GRAY);
 
+        //Alustetaan otsikon tiedot
         JTextField headerfield = new JTextField(temp.getOtsikko(), 1);
         headerfield.setMaximumSize(new Dimension(150,15));
-        headerfield.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        headerfield.setAlignmentX(panel.CENTER_ALIGNMENT);
 
+        //Alustetaan arvosana ja arvosanat sisältävä dropdown
         int arvotemp = temp.getArvosana();
         String arvosanatemp = Integer.toString(arvotemp);
         String[] grades={"1","2","3","4","5","6","7","8","9","10"};
         JComboBox<String> grade = new JComboBox<>(grades);
         grade.setSelectedItem(arvosanatemp);
         grade.setMaximumSize(new Dimension(150,15));
+
+        //Alustetaan arvosteluteksti
         JTextArea reviewtext = new JTextArea(temp.getArvosteluteksti(),
                 20,50);
         reviewtext.setWrapStyleWord(true);
         reviewtext.setLineWrap(true);
+        reviewtext.setAlignmentX(panel.CENTER_ALIGNMENT);
 
-        reviewtext.setAlignmentX(addwindow.CENTER_ALIGNMENT);
-
+        //Lisätään arvostelutekstiin scrollbar tarvittaessa
         JScrollPane rullatirullaa = new JScrollPane(reviewtext);
         rullatirullaa.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
+        //Alustetaan "+Media" -nappi
         JButton plusmedia = new JButton("+Media");
-        plusmedia.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        plusmedia.setAlignmentX(panel.CENTER_ALIGNMENT);
 
+        //Alustetaan poistonappi ja lisätään sille kuuntelija
         JButton delete = new JButton("Poista arvostelu");
-        delete.setAlignmentX(addwindow.CENTER_ALIGNMENT);
+        delete.setAlignmentX(panel.CENTER_ALIGNMENT);
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -607,11 +616,14 @@ public class SecondaryScreen {
             }
         });
 
+        //Lisätään komponentit
         panel.add(nimikealue);
         panel.add(kategoriaalue);
         panel.add(headerfield);
         panel.add(grade);
 
+        //Lisätään tekstikenttä ja scrollbar erilliseen JPaneliin, jotta
+        //ne ovat vierekkäin
         JPanel textArea = new JPanel();
         textArea.setLayout(new BoxLayout(textArea, BoxLayout.LINE_AXIS));
         textArea.add(rullatirullaa);
@@ -621,8 +633,8 @@ public class SecondaryScreen {
         panel.add(plusmedia);
         panel.add(delete);
 
-        addwindow.getContentPane().add(panel);
-        addwindow.add(panel);
+        //addwindow.getContentPane().add(panel);
+        //addwindow.add(panel);
 
         Object[] savecancelbuttons = {"Tallenna", "Peruuta"};
         int result = JOptionPane.showOptionDialog(secondaryFrame, panel,
@@ -634,15 +646,15 @@ public class SecondaryScreen {
             LocalDateTime reviewtime = LocalDateTime.now();
             String aika = reviewtime.format(dtf);
 
+            //Tarkistetaan ensin, että kaikki vaaditut tiedot ovat täytettyinä
+            //(otsikko ja arvosteluteksti)
             if (headerfield.getText().isBlank()) {
                 JPanel noHeader = new JPanel();
                 JLabel noHeaderWarning = new JLabel("Et antanut otsikkoa");
                 noHeader.add(noHeaderWarning);
 
-                JOptionPane.showMessageDialog(addwindow, noHeader,
+                JOptionPane.showMessageDialog(secondaryFrame, noHeader,
                         "Virhe!", JOptionPane.ERROR_MESSAGE);
-
-                addwindow.dispose();
                 return;
             }
             if (reviewtext.getText().isBlank()) {
@@ -650,19 +662,19 @@ public class SecondaryScreen {
                 JLabel noReviewTextWarning = new JLabel("Et kirjoittanut arvostelutekstiä");
                 noReviewtext.add(noReviewTextWarning);
 
-                JOptionPane.showMessageDialog(addwindow, noReviewtext,
+                JOptionPane.showMessageDialog(secondaryFrame, noReviewtext,
                         "Virhe!", JOptionPane.ERROR_MESSAGE);
 
-                addwindow.dispose();
                 return;
             }
 
+            //Muutetaan eli muokataan tiedot käyttäjän haluamiksi tiedoiksi
             arvostelut.get(i).setOtsikko(headerfield.getText());
             arvostelut.get(i).setArvosana(grade.getSelectedIndex()+1);
             arvostelut.get(i).setDate(aika);
             arvostelut.get(i).setArvosteluteksti(reviewtext.getText());
 
-            JPanel added = new JPanel();
+            /*JPanel added = new JPanel();
             added.setSize(400,800);
             JLabel otsikko = new JLabel(headerfield.getText());
             int a = arvostelut.get(i).getArvosana();
@@ -670,10 +682,14 @@ public class SecondaryScreen {
             JLabel arvosana = new JLabel(arvo);
             JLabel testi = new JLabel("hei");
 
+
             added.add(otsikko);
-            added.add(arvosana);
+            added.add(arvosana);*/
+            //Tallennetaan arvostelut
             SaveReviews();
+            //Ladataan arvostelut
             loadReviews();
+            //Renderöidään arvostelut
             InitializeReviews();
 
 

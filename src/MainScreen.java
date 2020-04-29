@@ -570,4 +570,115 @@ public class MainScreen extends JFrame {
                 break;
         }
     }
+
+    public void changeAssociatedReviews(String title, String category, boolean deleteReviews){
+        //Sama kansio, josta koodi suoritettiin.
+        File userDirFile = new File(System.getProperty("user.dir"));
+        String fullFile = File.separator + "object.ser";
+        File fileToCheck = new File(userDirFile, fullFile);
+        //ArrayList arvostelut on lopullista tallennusta varten.
+        ArrayList<ReviewPiece> arvostelut = new ArrayList();
+        //ArrayList temp on manipulointia varten.
+        ArrayList<ReviewPiece> temp = new ArrayList<>();
+
+        if(!fileToCheck.isFile()) {
+            File objSer = new File("object.ser");
+            try {
+                objSer.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
+                        File.separator + "object.ser");
+                ObjectInputStream in = new ObjectInputStream(file);
+
+                try {
+                    temp = (ArrayList<ReviewPiece>) in.readObject();
+                } catch (ClassNotFoundException c) {
+                    c.printStackTrace();
+                }
+                //this.arvostelut = temp;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        arvostelut = temp;
+
+        //Haemme oikeat arvostelut ja laitamme ne uuteen ArrayListiin
+        ArrayList<ReviewPiece> titleReviews = new ArrayList<>();
+        for(int i=0;i<temp.size();i++) {
+            //Oliota temp käytetään manipulointiin.
+            ReviewPiece manipulation = temp.get(i);
+            if (manipulation.getNimike().equals(title) &&
+                    manipulation.getKategoria().equals(category)) {
+                titleReviews.add(temp.get(i));
+                //temp.remove(i);
+            }
+        }
+
+        //Jos poistamme arvostelut, deleteReviews on true
+        if(deleteReviews=true){
+            //Käymme läpi kaikki arvostelut
+            for(int i=0;i<arvostelut.size();i++) {
+                //Vertaamme arvostelun tietoja poistettavien arvostelujen tietoihin
+                for(int x=0;x<titleReviews.size();x++) {
+                    if(arvostelut.get(i).getNimike() == titleReviews.get(x).getNimike() &&
+                        arvostelut.get(i).getKategoria() == titleReviews.get(x).getKategoria()){
+                        arvostelut.remove(i);
+                        //Koska muutamme ArrayListiä yhden pienemmäksi, joudumme
+                        //menemään yhden indeksin taaksepäin
+                        i--;
+                    }
+                }
+            }
+        }else{
+            //Muutamme nimikkeen tiedot arvosteluun
+            for(int i=0;i<titleReviews.size();i++) {
+                titleReviews.get(i).changeTitleInfo(title, category);
+            }
+            //Korvataan vanhat arvostelut muutetuilla tiedoilla arvostelut-ArrayListiin
+            for (int i=0;i<arvostelut.size();i++){
+                ReviewPiece testInfo = arvostelut.get(i);
+                for(int x=0; x<titleReviews.size(); x++) {
+                    if(titleReviews.get(x).exTitle == arvostelut.get(i).getNimike() &&
+                            titleReviews.get(x).exCategory == arvostelut.get(i).getKategoria()) {
+                        testInfo = titleReviews.get(x);
+                        arvostelut.set(i, testInfo);
+                    }
+                }
+            }
+        }
+
+        //Tallennetaan arvostelut tiedostoihin
+        try {
+            //Sama kansio, josta koodi suoritettiin.
+            //HUOMIO: INTELLIJ KIRJOITTAA OBJECT.SERIN SRC-KANSION YLEMPÄÄN KANSIOON
+            String directory = System.getProperty("user.dir") + File.separator + "object.ser";
+            System.out.println(directory);
+            FileOutputStream file = new FileOutputStream(directory);
+            ObjectOutputStream out = new ObjectOutputStream(file);
+            out.writeObject(arvostelut);
+
+            //tehdään vahvistusdialogi.
+            JPanel added = new JPanel();
+            JLabel addedConfirmation = new JLabel("Muutoksesi tallennettiin onnistuneesti");
+            added.add(addedConfirmation);
+
+            JOptionPane.showMessageDialog(titlesPanel, added,
+                    "Muutokset onnistuivat", JOptionPane.PLAIN_MESSAGE);
+
+        } catch (IOException e){
+            e.printStackTrace();
+            //Tehdään varoitusdialogi.
+            JPanel notAdded = new JPanel();
+            JLabel notAddedWarning = new JLabel("Muutoksiasi ei voitu tehdä");
+            notAdded.add(notAddedWarning);
+
+            JOptionPane.showMessageDialog(mainFrame, notAdded,
+                    "Virhe", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
 }
