@@ -3,7 +3,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.io.File;
@@ -154,13 +157,40 @@ public class MainScreen extends JFrame {
     // Avaa help dialogin, kun help nappia painetaan menussa
     private void openHelpWindow() {
 
-        String content = null;
+        //Path path = null;
+        //URL url = getClass().getResource("resources/readMe.txt");
+
+        BufferedReader br = null;
+        String content = "";
+
         try {
-            content = new String(Files.readAllBytes(Paths.get("src/resources/readMe.txt")));
+             //path = Paths.get(url.toURI());
+
+            String rivi;
+            br = new BufferedReader(new InputStreamReader(new FileInputStream("resources/readMe.txt"), "UTF-8"));
+
+            while((rivi = br.readLine()) != null ){
+                content = content + rivi + "\n";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(br != null){
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            }
+        /*
+        try {
+            content = Files.readString(path);
+            //content = Files.readString(Path.of((System.getProperty("user.dir")) + "/resources/readMe.txt"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+*/
         // frame help ikkunalle
         JFrame helpFrame = new JFrame("Käyttöohjeet");
         helpFrame.setSize(600, 440);
@@ -321,7 +351,7 @@ public class MainScreen extends JFrame {
             }
         }
 
-        //Tongintaan jokaisen nimikkeeseen täsmäävän arvostelun arvosanat ja lasketaan yhteen
+        //Tongitaan jokaisen nimikkeeseen täsmäävän arvostelun arvosanat ja lasketaan yhteen
         //Seurataan myös arvostelujen määrää, tätä tarvitaan keskiarvon laskemiseen
         for(ReviewPiece review: arvostelut){
             if(review.getNimike().equals(ep.getEntertainmentName()) &&
@@ -341,6 +371,7 @@ public class MainScreen extends JFrame {
         String avgString = Integer.toString(avg);
 
         try{
+            System.out.println(getClass().getResource("resources/" + avgString + ".png"));
             Image img = ImageIO.read(getClass().getResource("resources/" + avgString + ".png"));
             avgGrade.setIcon(new ImageIcon(img));
             avgGrade.setFocusable(false);
@@ -437,7 +468,8 @@ public class MainScreen extends JFrame {
             e.printStackTrace();
         }
     }
-        //Kirjoitetaan (ja luodaan) epArray.txt, johon lisätään edellä luotu EP
+
+    //Kirjoitetaan (ja luodaan) epArray.txt, johon lisätään edellä luotu EP
     private void writeEPArrayTxt(){
         try {
             FileWriter fw = new FileWriter("epArray.txt");

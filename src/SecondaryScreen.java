@@ -489,7 +489,15 @@ public class SecondaryScreen {
                 String aika = arvostelut.get(i).getDate();
 
                 JLabel header = new JLabel(otsikko);
-                JLabel grade = new JLabel(arvosana);
+                JLabel grade = new JLabel();
+
+                try{
+                    Image img = ImageIO.read(getClass().getResource("resources/" + arvosana + ".png"));
+                    grade.setIcon(new ImageIcon(img));
+                } catch(Exception ex){
+                    ex.printStackTrace();
+                }
+
                 JLabel date = new JLabel(aika);
                 JButton open = new JButton("Avaa");
                 int test = i;
@@ -717,11 +725,21 @@ public class SecondaryScreen {
 
         //Alustetaan arvostelun otsikko ja arvosana
         JPanel headerAndGrade = new JPanel();
-        headerAndGrade.setMaximumSize(new Dimension(1000,50));
-        headerAndGrade.setPreferredSize(new Dimension(1000,50));
+        headerAndGrade.setMaximumSize(new Dimension(1000,80));
+        headerAndGrade.setPreferredSize(new Dimension(1000,80));
         headerAndGrade.setLayout(new BoxLayout(headerAndGrade, BoxLayout.LINE_AXIS));
         ReviewPiece temp = arvostelut.get(i);
-        JLabel grade = new JLabel(Integer.toString(temp.getArvosana()));
+        JLabel grade = new JLabel();
+
+        String tempGrade = Integer.toString(temp.getArvosana());
+
+        try{
+            Image img = ImageIO.read(getClass().getResource("resources/" + tempGrade + ".png"));
+            grade.setIcon(new ImageIcon(img));
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+
         JLabel header = new JLabel(temp.getOtsikko());
         headerAndGrade.add(Box.createRigidArea(new Dimension(5,0)));
         headerAndGrade.add(grade);
