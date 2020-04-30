@@ -1,14 +1,9 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.io.File;
@@ -372,34 +367,45 @@ public class MainScreen extends JFrame {
         //Säädetään paneelin komponentteja paikoilleen GridBagLayoutilla
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.insets = new Insets(0,30,0,0);
-        gbc.ipady = 10;
-        gbc.gridwidth = 1;
+        gbc.ipady = 15;
+        gbc.gridwidth = 2;
         gbc.gridheight = 2;
-        gbc.weightx = 0.8;
-        gbc.weighty = 0.8;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 0.2;
+        avgGrade.setMaximumSize(new Dimension(120,66));
+        avgGrade.setPreferredSize(new Dimension(120,66));
         epPanel.add(avgGrade, gbc);
+        gbc.insets = new Insets(0,-320,0,0);
 
+        epName.setMaximumSize(new Dimension(200,10));
+        epName.setMinimumSize(new Dimension(120,10));
+        epName.setPreferredSize(new Dimension(180,10));
+        gbc.weightx = 0.3;
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
         gbc.gridheight = 1;
         epPanel.add(epName, gbc);
 
         gbc.gridy = 1;
-        gbc.insets = new Insets(0,30,0,0);
         epCateg.setMaximumSize(new Dimension(200,10));
-        epCateg.setMinimumSize(new Dimension(60,10));
-        epCateg.setPreferredSize(new Dimension(150,10));
+        epCateg.setMinimumSize(new Dimension(120,10));
+        epCateg.setPreferredSize(new Dimension(180,10));
         epPanel.add(epCateg, gbc);
 
-        gbc.insets = new Insets(0,0,0,-60);
+        gbc.insets = new Insets(0,0,0,-500);
         gbc.anchor = GridBagConstraints.LINE_END;
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
+        gbc.gridwidth = 1;
         gbc.gridheight = 2;
-        gbc.gridx = 1;
+        gbc.gridx = 2;
         gbc.gridy = 0;
         epPanel.add(openButton, gbc);
 
         gbc.insets = new Insets(0,0,0,100);
-        gbc.gridx = 2;
+        gbc.gridx = 3;
         epPanel.add(editButton, gbc);
 
         //revalidate & repaint, jotta paneeli päivittyy
