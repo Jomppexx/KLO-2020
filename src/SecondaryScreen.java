@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +14,6 @@ public class SecondaryScreen {
 
     //ArraList ladatuille arvosteluille.
     ArrayList<ReviewPiece> arvostelut = new ArrayList<>();
-
 
     public String selectedTitleName; //Valitun nimikkeen nimi.
     public String selectedTitleCategory; //Valitun nimikkeen kategoria.
@@ -53,6 +51,7 @@ public class SecondaryScreen {
             @Override
             public void windowClosing(WindowEvent event){
                 mainScrFrame.setVisible(true);
+                //MainScreen.buildEPBox(currentEP);
                 secondaryFrame.dispose();
             }
         });

@@ -1,6 +1,10 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -271,9 +275,15 @@ public class MainScreen extends JFrame {
         JPanel epPanel = new JPanel();
         JLabel epName = new JLabel();
         JLabel epCateg = new JLabel();
+        JLabel avgGrade = new JLabel();
         JButton openButton = new JButton("Avaa");
         epPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
+        List<Integer> grades = new ArrayList<Integer>();
+        ArrayList<ReviewPiece> arvostelut = new ArrayList<ReviewPiece>();
+        int sum = 0;
+        float average = 0;
+        int numReviews = 0;
 
         //Avaa -napin action listener. Avaa kysyisen nimikkeen tiedoilla arvostelulistanäkymän
         openButton.addActionListener(event -> {
@@ -281,6 +291,70 @@ public class MainScreen extends JFrame {
                     ep.getCategory());
             mainFrame.setVisible(false);
         });
+
+        //{LASKE KESKIARVO METODI
+
+        //Sama kansio, josta koodi suoritettiin.
+        File userDirFile = new File(System.getProperty("user.dir"));
+        String fullFile = File.separator + "object.ser";
+        File fileToCheck = new File(userDirFile, fullFile);
+
+        //Tarkistetaan että tiedosto on olemassa, jos ei ole sellainen luodaan errorin välttämiseksi
+        //Jos tiedostoa ei ollut olemassa sitä ei myöskään yritetä lukea
+        if(!fileToCheck.isFile()) {
+            File objSer = new File("object.ser");
+            try {
+                objSer.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //Luetaan arvostelut listalle kaikki arvostelut object.ser tiedostosta
+            try {
+                FileInputStream file = new FileInputStream(System.getProperty("user.dir") +
+                        File.separator + "object.ser");
+                ObjectInputStream in = new ObjectInputStream(file);
+                ArrayList<ReviewPiece> temp = new ArrayList<>();
+                try {
+                    temp = (ArrayList<ReviewPiece>) in.readObject();
+                } catch (ClassNotFoundException c) {
+                    c.printStackTrace();
+                }
+                arvostelut = temp;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Tongintaan jokaisen nimikkeeseen täsmäävän arvostelun arvosanat ja lasketaan yhteen
+        //Seurataan myös arvostelujen määrää, tätä tarvitaan keskiarvon laskemiseen
+        for(ReviewPiece review: arvostelut){
+            if(review.getNimike().equals(ep.getEntertainmentName()) &&
+                    review.getKategoria().equals(ep.getCategory())){
+                grades.add(review.getArvosana());
+                numReviews = numReviews + 1;
+            }
+        }
+
+        for(int grade: grades){
+            sum = sum + grade;
+        }
+
+        average = (float) sum/numReviews;
+        int avg = Math.round(average);
+
+        String avgString = Integer.toString(avg);
+
+        try{
+            Image img = ImageIO.read(getClass().getResource("resources/" + avgString + ".png"));
+            avgGrade.setIcon(new ImageIcon(img));
+            avgGrade.setFocusable(false);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+
+
+        //} LASKE KESKIARVO METODI
 
         //Muokkaa nappi, avaa ikkunan, jossa voi muokata nimikkeen tietoja (nimi & kategoria)
         JButton editButton = new JButton("Muokkaa");
@@ -290,15 +364,22 @@ public class MainScreen extends JFrame {
         epName.setText(ep.getEntertainmentName());
         epCateg.setText(fullCategory);
 
+        //Paneelin kokoasetuksia
+        epName.setMaximumSize(new Dimension(200,10));
+        epName.setMinimumSize(new Dimension(60,10));
+        epName.setPreferredSize(new Dimension(150,10));
+
+        //Säädetään paneelin komponentteja paikoilleen GridBagLayoutilla
         gbc.anchor = GridBagConstraints.LINE_START;
         gbc.insets = new Insets(0,30,0,0);
         gbc.ipady = 10;
         gbc.gridwidth = 1;
+        gbc.gridheight = 2;
         gbc.weightx = 0.8;
         gbc.weighty = 0.8;
-        epName.setMaximumSize(new Dimension(200,10));
-        epName.setMinimumSize(new Dimension(60,10));
-        epName.setPreferredSize(new Dimension(150,10));
+        epPanel.add(avgGrade, gbc);
+
+        gbc.gridheight = 1;
         epPanel.add(epName, gbc);
 
         gbc.gridy = 1;
@@ -454,7 +535,8 @@ public class MainScreen extends JFrame {
 
             //Varmistetaan käyttäjältä että valittu nimike halutaan poistaa
             String[] warningOptions = {"Kyllä", "Ei"};
-            int optionResult = JOptionPane.showOptionDialog(mainFrame, ("Haluatko varmasti poistaa nimikkeen " + oldEPName + "?"),
+            int optionResult = JOptionPane.showOptionDialog(mainFrame, ("Haluatko varmasti poistaa nimikkeen " + oldEPName + "? " +
+                            "\nNimikkeen poistaminen poistaa myös siihen liittyvät arvostelut."),
                     "Varoitus!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, warningOptions, null);
 
             //Jos hyväksytään, poistetaan
@@ -573,7 +655,6 @@ public class MainScreen extends JFrame {
         String selectedItem = selected.toString();
         EntertainmentPiece temp = new EntertainmentPiece("", "");
 
-
         switch(selectedItem){
 
             //Lajittelee ja tulostaa nimikkeet aakkosjärjestyksessä päänäkymään
@@ -664,7 +745,7 @@ public class MainScreen extends JFrame {
         }
 
         //Jos poistamme arvostelut, deleteReviews on true
-        if(deleteReviews=true){
+        if(deleteReviews == true){
             //Käymme läpi kaikki arvostelut
             for(int i=0;i<arvostelut.size();i++) {
                 //Vertaamme arvostelun tietoja poistettavien arvostelujen tietoihin
