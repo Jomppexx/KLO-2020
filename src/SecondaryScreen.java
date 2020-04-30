@@ -320,7 +320,7 @@ public class SecondaryScreen {
         //Lisätään arvosteludropdown
         String[] grades={"1","2","3","4","5","6","7","8","9","10"};
         JComboBox<String> grade = new JComboBox<>(grades);
-        grade.setMaximumSize(new Dimension(150,15));
+        grade.setMaximumSize(new Dimension(150,20));
         JLabel gradeIs = new JLabel("Arvosana: ");
         JPanel gradePanel = new JPanel();
         gradePanel.setLayout(new BoxLayout(gradePanel, BoxLayout.LINE_AXIS));
@@ -536,6 +536,10 @@ public class SecondaryScreen {
             reviewsPanel.revalidate();
             reviewsPanel.repaint();
         }
+        //Koska muutimme käyttöliittymää koodin suorituksen aikana, joudumme
+        //suorittamaan seuraavat komennot.
+        reviewsPanel.revalidate();
+        reviewsPanel.repaint();
     }
 
     //editReview-funktio suorittaa arvostelun muokkauksen.
@@ -566,7 +570,7 @@ public class SecondaryScreen {
         nimikealue.setLayout(new BoxLayout(nimikealue, BoxLayout.LINE_AXIS));
         nimikealue.add(nimike);
         nimikealue.add(title);
-        nimikealue.setBackground(Color.LIGHT_GRAY);
+        nimikealue.setBackground(Color.WHITE);
 
         //Alustetaan kategoriatiedot ja laitetaan ne JPaneeliin
         JLabel category = new JLabel(selectedTitleCategory);
@@ -576,20 +580,32 @@ public class SecondaryScreen {
         kategoriaalue.setLayout(new BoxLayout(kategoriaalue, BoxLayout.LINE_AXIS));
         kategoriaalue.add(kategoria);
         kategoriaalue.add(category);
-        kategoriaalue.setBackground(Color.LIGHT_GRAY);
+        kategoriaalue.setBackground(Color.WHITE);
 
         //Alustetaan otsikon tiedot
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.LINE_AXIS));
+        headerPanel.setBackground(Color.WHITE);
+        JLabel otsikkoKuvaus = new JLabel("Otsikko: ");
         JTextField headerfield = new JTextField(temp.getOtsikko(), 1);
-        headerfield.setMaximumSize(new Dimension(150,15));
+        headerfield.setMaximumSize(new Dimension(150,20));
         headerfield.setAlignmentX(editReviewPanel.CENTER_ALIGNMENT);
+        headerPanel.add(otsikkoKuvaus);
+        headerPanel.add(headerfield);
 
         //Alustetaan arvosana ja arvosanat sisältävä dropdown
+        JPanel gradePanel = new JPanel();
+        gradePanel.setLayout(new BoxLayout(gradePanel, BoxLayout.LINE_AXIS));
+        gradePanel.setBackground(Color.WHITE);
+        JLabel arvosanaKuvaus = new JLabel("Arvosana: ");
         int arvotemp = temp.getArvosana();
         String arvosanatemp = Integer.toString(arvotemp);
         String[] grades={"1","2","3","4","5","6","7","8","9","10"};
         JComboBox<String> grade = new JComboBox<>(grades);
         grade.setSelectedItem(arvosanatemp);
-        grade.setMaximumSize(new Dimension(150,15));
+        grade.setMaximumSize(new Dimension(150,20));
+        gradePanel.add(arvosanaKuvaus);
+        gradePanel.add(grade);
 
         //Alustetaan arvosteluteksti
         JTextArea reviewtext = new JTextArea(temp.getArvosteluteksti(),
@@ -621,8 +637,10 @@ public class SecondaryScreen {
         //Lisätään komponentit
         editReviewPanel.add(nimikealue);
         editReviewPanel.add(kategoriaalue);
-        editReviewPanel.add(headerfield);
-        editReviewPanel.add(grade);
+        //editReviewPanel.add(headerfield);
+        //editReviewPanel.add(grade);
+        editReviewPanel.add(headerPanel);
+        editReviewPanel.add(gradePanel);
 
         //Lisätään tekstikenttä ja scrollbar erilliseen JPaneliin, jotta
         //ne ovat vierekkäin
@@ -767,13 +785,14 @@ public class SecondaryScreen {
 
             //Tallennetaan muutokset
             SaveReviews();
-            //Vahvistusviesti poistolle
-            JOptionPane.showMessageDialog(deleteConfirmation, deletedReviewPanel,
-                    "", JOptionPane.PLAIN_MESSAGE);
             //Ladataan arvostelut
             loadReviews();
             //Renderöidään arvostelut
             InitializeReviews();
+            //Vahvistusviesti poistolle
+            JOptionPane.showMessageDialog(deleteConfirmation, deletedReviewPanel,
+                    "", JOptionPane.PLAIN_MESSAGE);
+
         }
     }
 
