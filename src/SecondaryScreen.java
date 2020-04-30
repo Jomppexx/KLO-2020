@@ -716,6 +716,7 @@ public class SecondaryScreen {
 
         //Alustetaan arvostelutekstialue ja laitetaan sille tarvittaessa scrollbar
         JPanel reviewTextArea = new JPanel();
+        reviewTextArea.setBackground(Color.LIGHT_GRAY);
         reviewTextArea.setLayout(new BoxLayout(reviewTextArea, BoxLayout.PAGE_AXIS));
         JTextArea reviewTextGoesHere = new JTextArea(temp.getArvosteluteksti(), 5,
                 60);
